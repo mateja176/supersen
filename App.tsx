@@ -1,17 +1,24 @@
+import { INITIAL_COLOR } from '@env';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Picker, StyleSheet, Text, View } from 'react-native';
-import { Color, RGBColor, SketchPicker, SketchPickerProps } from 'react-color';
+import { RGBColor, SketchPicker, SketchPickerProps } from 'react-color';
+import { StyleSheet, View } from 'react-native';
 import Pixel from './components/Pixel';
+
+if (!INITIAL_COLOR) {
+  throw new Error('INITIAL_COLOR not defined');
+}
+
+const [r, g, b] = INITIAL_COLOR.split(',').map(Number);
 
 const initialAlpha = 255;
 const initialColor: Required<RGBColor> = {
-  r: 255,
-  g: 0,
-  b: 0,
+  r: r ?? 255,
+  g: g ?? 255,
+  b: b ?? 255,
   a: initialAlpha,
 };
-export default function App() {
+export default function App(): React.ReactElement {
   const [currentColor, setCurrentColor] = useState(initialColor);
   const [color, setColor] = useState(initialColor);
 
