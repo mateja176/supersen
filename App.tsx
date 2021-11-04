@@ -1,21 +1,28 @@
 import { INITIAL_COLOR } from '@env';
 import { StatusBar } from 'expo-status-bar';
+import { isRight } from 'fp-ts/lib/Either';
 import React, { useState } from 'react';
 import { RGBColor, SketchPicker, SketchPickerProps } from 'react-color';
 import { StyleSheet, View } from 'react-native';
 import Pixel from './components/Pixel';
+import Color from './models/Color';
 
 if (!INITIAL_COLOR) {
   throw new Error('INITIAL_COLOR not defined');
 }
-
-const [r, g, b] = INITIAL_COLOR.split(',').map(Number);
+const maybeColor = Color.decode(JSON.parse(INITIAL_COLOR));
+if (!isRight(maybeColor)) {
+  throw new Error(
+    'INITIAL_COLOR must be of type [u_int8_t, u_int8_t, u_int8_t]',
+  );
+}
+const [r, g, b] = maybeColor.right;
 
 const initialAlpha = 255;
 const initialColor: Required<RGBColor> = {
-  r: r ?? 255,
-  g: g ?? 255,
-  b: b ?? 255,
+  r,
+  g,
+  b,
   a: initialAlpha,
 };
 export default function App(): React.ReactElement {
