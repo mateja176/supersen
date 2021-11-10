@@ -1,25 +1,17 @@
-import { INITIAL_COLOR } from '@env';
 import { StatusBar } from 'expo-status-bar';
-import { isRight } from 'fp-ts/lib/Either';
 import React, { useState } from 'react';
-import { RGBColor, SketchPicker, SketchPickerProps } from 'react-color';
+import { SketchPicker, SketchPickerProps } from 'react-color';
 import { StyleSheet, View } from 'react-native';
 import Pixel from './components/Pixel';
-import Color from './models/Color';
+import { Color } from './models/pixels';
+import { color } from './services/env';
+import { setPixels } from './services/pixels';
+import { pixelsRange } from './utils/pixels';
 
-if (!INITIAL_COLOR) {
-  throw new Error('INITIAL_COLOR not defined');
-}
-const maybeColor = Color.decode(JSON.parse(INITIAL_COLOR));
-if (!isRight(maybeColor)) {
-  throw new Error(
-    'INITIAL_COLOR must be of type [u_int8_t, u_int8_t, u_int8_t]',
-  );
-}
-const [r, g, b] = maybeColor.right;
+const [r, g, b] = color;
 
 const initialAlpha = 255;
-const initialColor: Required<RGBColor> = {
+const initialColor: Color = {
   r,
   g,
   b,
@@ -28,6 +20,10 @@ const initialColor: Required<RGBColor> = {
 export default function App(): React.ReactElement {
   const [currentColor, setCurrentColor] = useState(initialColor);
   const [color, setColor] = useState(initialColor);
+
+  React.useEffect(() => {
+    setPixels(pixelsRange.map(() => color));
+  }, []);
 
   const handleChange: SketchPickerProps['onChange'] = (colorResult) => {
     setCurrentColor({
