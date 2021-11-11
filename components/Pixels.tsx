@@ -42,6 +42,16 @@ export interface PixelsProps {}
 const Pixels: React.FC<PixelsProps> = (props) => {
   const theme = useTheme();
 
+  const handleError = (error: unknown) => {
+    Toast.show(
+      `Update Failed: ${isError(error) ? error.message : 'Unknown reason'}`,
+      {
+        backgroundColor: theme.colors.danger,
+        duration: Toast.durations.SHORT,
+      },
+    );
+  };
+
   const setPixelsMutation = useMutation(setPixels, {
     onSuccess: () => {
       Toast.show('Pixels Updated!', {
@@ -49,22 +59,15 @@ const Pixels: React.FC<PixelsProps> = (props) => {
         duration: Toast.durations.SHORT,
       });
     },
-    onError: (error) => {
-      Toast.show(
-        `Update Failed: ${isError(error) ? error.message : 'Unknown reason'}`,
-        {
-          backgroundColor: theme.colors.danger,
-          duration: Toast.durations.SHORT,
-        },
-      );
-    },
   });
 
   const [currentColor, setCurrentColor] = useState(initialColor);
   const [color, setColor] = useState(initialColor);
 
   React.useEffect(() => {
-    setPixelsMutation.mutateAsync(pixelsRange.map(() => color));
+    setPixelsMutation
+      .mutateAsync(pixelsRange.map(() => color))
+      .catch(handleError);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange: SketchPickerProps['onChange'] = (colorResult) => {
@@ -82,7 +85,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     });
   };
   const handlePress = () => {
-    setPixelsMutation.mutateAsync([color]);
+    setPixelsMutation.mutateAsync([color]).catch(handleError);
   };
 
   return (

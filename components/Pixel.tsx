@@ -1,7 +1,8 @@
 import styled from '@emotion/native';
 import { RGBColor } from 'react-color';
+import { ViewProps } from 'react-native';
 
-export interface PixelProps {
+export interface PixelProps extends ViewProps {
   color: RGBColor;
 }
 
