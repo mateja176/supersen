@@ -1,0 +1,30 @@
+diff --git a/node_modules/react-native-root-toast/lib/ToastContainer.js b/node_modules/react-native-root-toast/lib/ToastContainer.js
+index 7b27142..eae2504 100644
+--- a/node_modules/react-native-root-toast/lib/ToastContainer.js
++++ b/node_modules/react-native-root-toast/lib/ToastContainer.js
+@@ -3,7 +3,6 @@ import React, {
+ } from 'react';
+ import PropTypes from 'prop-types';
+ import {
+-    ViewPropTypes,
+     StyleSheet,
+     View,
+     Text,
+@@ -62,8 +61,7 @@ class ToastContainer extends Component {
+     static displayName = 'ToastContainer';
+ 
+     static propTypes = {
+-        ...ViewPropTypes,
+-        containerStyle: ViewPropTypes.style,
++        containerStyle: { style: () => {} },
+         duration: PropTypes.number,
+         visible: PropTypes.bool,
+         position: PropTypes.number,
+@@ -74,7 +72,6 @@ class ToastContainer extends Component {
+         opacity: PropTypes.number,
+         shadowColor: PropTypes.string,
+         textColor: PropTypes.string,
+-        textStyle: Text.propTypes.style,
+         delay: PropTypes.number,
+         hideOnPress: PropTypes.bool,
+         onPress: PropTypes.func,

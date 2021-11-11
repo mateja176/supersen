@@ -2,6 +2,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "postinstall": "patch-package",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -27,7 +28,9 @@
     "react-color": "^2.19.3",
     "react-dom": "^17.0.1",
     "react-native": "0.64.2",
+    "react-native-root-toast": "^3.3.0",
     "react-native-web": "^0.17.1",
+    "react-query": "^3.32.1",
     "zod": "^3.11.6"
   },
   "devDependencies": {
@@ -45,6 +48,7 @@
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^7.0.4",
+    "patch-package": "^6.4.7",
     "prettier": "^2.4.1",
     "react-native-dotenv": "^3.3.0",
     "typescript": "~4.3.5"
