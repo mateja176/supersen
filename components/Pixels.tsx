@@ -4,6 +4,7 @@ import { SketchPicker, SketchPickerProps } from 'react-color';
 import { Button, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-root-toast';
 import { isError, useMutation } from 'react-query';
+import useTheme from '../hooks/theme';
 import { Color } from '../models/pixels';
 import { color } from '../services/env';
 import { setPixels } from '../services/pixels';
@@ -39,14 +40,22 @@ const styles = StyleSheet.create({
 export interface PixelsProps {}
 
 const Pixels: React.FC<PixelsProps> = (props) => {
+  const theme = useTheme();
+
   const setPixelsMutation = useMutation(setPixels, {
     onSuccess: () => {
-      Toast.show('Pixels Updated!', { duration: Toast.durations.SHORT });
+      Toast.show('Pixels Updated!', {
+        backgroundColor: theme.colors.success,
+        duration: Toast.durations.SHORT,
+      });
     },
     onError: (error) => {
       Toast.show(
         `Update Failed: ${isError(error) ? error.message : 'Unknown reason'}`,
-        { duration: Toast.durations.SHORT },
+        {
+          backgroundColor: theme.colors.danger,
+          duration: Toast.durations.SHORT,
+        },
       );
     },
   });
