@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { SketchPicker, SketchPickerProps } from 'react-color';
-import { StyleSheet, View } from 'react-native';
+import { Button, StyleSheet, View } from 'react-native';
 import Pixel from './components/Pixel';
 import { Color } from './models/pixels';
 import { color } from './services/env';
@@ -10,7 +10,8 @@ import { pixelsRange } from './utils/pixels';
 
 const [r, g, b] = color;
 
-const initialAlpha = 255;
+const minimalAlpha = 0.01;
+const initialAlpha = 1;
 const initialColor: Color = {
   r,
   g,
@@ -28,17 +29,26 @@ export default function App(): React.ReactElement {
   const handleChange: SketchPickerProps['onChange'] = (colorResult) => {
     setCurrentColor({
       ...colorResult.rgb,
-      a: colorResult.rgb.a ?? initialAlpha,
+      a: (colorResult.rgb.a ?? initialAlpha) || minimalAlpha,
     });
   };
   const handleChangeComplete: SketchPickerProps['onChangeComplete'] = (
     colorResult,
   ) => {
-    setColor({ ...colorResult.rgb, a: colorResult.rgb.a ?? initialAlpha });
+    setColor({
+      ...colorResult.rgb,
+      a: (colorResult.rgb.a ?? initialAlpha) || minimalAlpha,
+    });
   };
+  const handlePress = () => {
+    setPixels([color]);
+  };
+
   return (
     <View style={styles.container}>
-      <Pixel color={color} />
+      <View style={styles.pixels}>
+        <Pixel color={color} />
+      </View>
 
       <SketchPicker
         color={currentColor}
@@ -46,6 +56,9 @@ export default function App(): React.ReactElement {
         onChangeComplete={handleChangeComplete}
       />
       <StatusBar style="auto" />
+      <View style={styles.buttonWrapper}>
+        <Button onPress={handlePress} title="Submit" />
+      </View>
     </View>
   );
 }
@@ -56,5 +69,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  pixels: {
+    marginBottom: 20,
+  },
+  buttonWrapper: {
+    marginTop: 20,
   },
 });

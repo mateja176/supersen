@@ -5,7 +5,7 @@ import { api } from './env';
 
 const adjustBrightness =
   (alpha: Color['a']) => (channel: z.infer<typeof Channel>) => {
-    return Math.round((alpha / 255) * channel);
+    return Math.round(alpha * channel);
   };
 
 export const setPixels = async (
