@@ -1,7 +1,7 @@
 import { RGBColor } from 'react-color';
 import { z } from 'zod';
 
-export const Pixels = z.number().int().min(1);
+export const Int = z.number().int().min(1);
 
 export const Channel = z.number().int().min(0).max(255);
 

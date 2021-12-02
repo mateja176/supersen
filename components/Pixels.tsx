@@ -8,7 +8,7 @@ import useTheme from '../hooks/theme';
 import { Color } from '../models/pixels';
 import { color } from '../services/env';
 import { setPixels } from '../services/pixels';
-import { pixelsRange } from '../utils/pixels';
+import { boardRange } from '../utils/pixels';
 import Pixel from './Pixel';
 
 const [r, g, b] = color;
@@ -21,19 +21,24 @@ const initialColor: Color = {
   b,
   a: initialAlpha,
 };
+const initialColors: Color[] = boardRange.flatMap((xRange) =>
+  xRange.map(() => initialColor),
+);
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: '100%',
   },
   pixels: {
-    marginBottom: 20,
+    paddingTop: '5%',
+    paddingLeft: '5%',
+    width: '100%',
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   buttonWrapper: {
-    marginTop: 20,
+    marginTop: '1rem',
   },
 });
 
@@ -62,12 +67,10 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   });
 
   const [currentColor, setCurrentColor] = useState(initialColor);
-  const [color, setColor] = useState(initialColor);
+  const [colors, setColors] = useState(initialColors);
 
   React.useEffect(() => {
-    setPixelsMutation
-      .mutateAsync(pixelsRange.map(() => color))
-      .catch(handleError);
+    setPixelsMutation.mutateAsync(colors).catch(handleError);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange: SketchPickerProps['onChange'] = (colorResult) => {
@@ -79,19 +82,25 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   const handleChangeComplete: SketchPickerProps['onChangeComplete'] = (
     colorResult,
   ) => {
-    setColor({
-      ...colorResult.rgb,
-      a: (colorResult.rgb.a ?? initialAlpha) || minimalAlpha,
-    });
+    setColors([
+      {
+        ...colorResult.rgb,
+        a: (colorResult.rgb.a ?? initialAlpha) || minimalAlpha,
+      },
+    ]);
   };
   const handlePress = () => {
-    setPixelsMutation.mutateAsync([color]).catch(handleError);
+    setPixelsMutation.mutateAsync(colors).catch(handleError);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.pixels}>
-        <Pixel color={color} />
+        {boardRange.map((xRange) => {
+          return xRange.map((i) => {
+            return <Pixel key={i} color={colors[i]} />;
+          });
+        })}
       </View>
       <SketchPicker
         color={currentColor}

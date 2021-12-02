@@ -1,4 +1,8 @@
-import { range } from 'fp-ts/lib/ReadonlyNonEmptyArray';
-import { pixels } from '../services/env';
+import { pixelsX, pixelsY } from '../services/env';
 
-export const pixelsRange = range(0, pixels - 1);
+const xRange: number[] = Array(pixelsX).fill(0);
+const yRange: number[] = Array(pixelsY).fill(0);
+// * limited to two dimensions
+export const boardRange = yRange.map((_, i) =>
+  xRange.map((_, j) => xRange.length * i + j),
+);
