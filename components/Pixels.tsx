@@ -36,7 +36,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     Toast.show(
       `Update Failed: ${isError(error) ? error.message : 'Unknown reason'}`,
       {
-        backgroundColor: theme.colors.danger,
+        backgroundColor: theme.colors.bg.danger,
         duration: Toast.durations.SHORT,
       },
     );
@@ -45,7 +45,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   const setPixelsMutation = useMutation(services.setPixels, {
     onSuccess: () => {
       Toast.show('Pixels Updated!', {
-        backgroundColor: theme.colors.success,
+        backgroundColor: theme.colors.bg.success,
         duration: Toast.durations.SHORT,
       });
     },
