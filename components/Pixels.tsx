@@ -1,29 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React from 'react';
 import { SketchPicker, SketchPickerProps } from 'react-color';
 import { Button, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-root-toast';
 import { isError, useMutation } from 'react-query';
+import usePixels from '../hooks/pixels';
 import useTheme from '../hooks/theme';
-import { Color } from '../models/pixels';
-import { color } from '../services/env';
-import { setPixels } from '../services/pixels';
-import { boardRange } from '../utils/pixels';
+import * as services from '../services/pixels';
+import { pixelsRange } from '../utils/pixels';
 import Pixel from './Pixel';
-
-const [r, g, b] = color;
-
-const minimalAlpha = 0.01;
-const initialAlpha = 1;
-const initialColor: Color = {
-  r,
-  g,
-  b,
-  a: initialAlpha,
-};
-const initialColors: Color[] = boardRange.flatMap((xRange) =>
-  xRange.map(() => initialColor),
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -57,7 +42,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     );
   };
 
-  const setPixelsMutation = useMutation(setPixels, {
+  const setPixelsMutation = useMutation(services.setPixels, {
     onSuccess: () => {
       Toast.show('Pixels Updated!', {
         backgroundColor: theme.colors.success,
@@ -66,39 +51,38 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     },
   });
 
-  const [currentColor, setCurrentColor] = useState(initialColor);
-  const [colors, setColors] = useState(initialColors);
+  const { pixels, toggleSelected, setRgbColor } = usePixels();
 
   React.useEffect(() => {
-    setPixelsMutation.mutateAsync(colors).catch(handleError);
+    setPixelsMutation.mutateAsync(pixels).catch(handleError);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleChange: SketchPickerProps['onChange'] = (colorResult) => {
-    setCurrentColor({
-      ...colorResult.rgb,
-      a: (colorResult.rgb.a ?? initialAlpha) || minimalAlpha,
-    });
+  const currentColor = pixels.find(({ selected }) => selected);
+
+  const handleChange: SketchPickerProps['onChange'] = ({ rgb }) => {
+    setRgbColor(rgb);
   };
-  const handleChangeComplete: SketchPickerProps['onChangeComplete'] = (
-    colorResult,
-  ) => {
-    setColors([
-      {
-        ...colorResult.rgb,
-        a: (colorResult.rgb.a ?? initialAlpha) || minimalAlpha,
-      },
-    ]);
+  const handleChangeComplete: SketchPickerProps['onChangeComplete'] = ({
+    rgb,
+  }) => {
+    setRgbColor(rgb);
   };
   const handlePress = () => {
-    setPixelsMutation.mutateAsync(colors).catch(handleError);
+    setPixelsMutation.mutateAsync(pixels).catch(handleError);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.pixels}>
-        {boardRange.map((xRange) => {
+        {pixelsRange.map((xRange) => {
           return xRange.map((i) => {
-            return <Pixel key={i} color={colors[i]} />;
+            return (
+              <Pixel
+                key={i}
+                pixel={pixels[i]}
+                onToggle={() => toggleSelected(i)}
+              />
+            );
           });
         })}
       </View>

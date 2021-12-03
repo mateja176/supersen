@@ -1,22 +1,51 @@
 import React from 'react';
-import { RGBColor } from 'react-color';
-import { View, ViewProps } from 'react-native';
+import {
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+  ViewProps,
+} from 'react-native';
+import { CheckBox } from 'react-native-web';
+import { IPixel } from '../hooks/pixels';
+
+const styles = StyleSheet.create({
+  pixel: {
+    marginRight: '5%',
+    marginBottom: '5%',
+    width: '20%',
+    paddingTop: '20%',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderStyle: 'solid',
+  },
+  checkBox: {
+    top: '5%',
+    right: '5%',
+    position: 'absolute',
+  },
+});
 
 export interface PixelProps extends ViewProps {
-  color: RGBColor;
+  pixel: IPixel;
+  onToggle: () => void;
 }
 
-const Pixel: React.FC<PixelProps> = (props) => {
+const Pixel: React.FC<PixelProps> = ({ pixel, onToggle, ...props }) => {
   return (
-    <View
-      style={{
-        marginRight: '5%',
-        marginBottom: '5%',
-        width: '20%',
-        paddingTop: '20%',
-        backgroundColor: `rgba(${props.color.r}, ${props.color.g}, ${props.color.b}, ${props.color.a})`,
-      }}
-    />
+    <TouchableWithoutFeedback onPress={onToggle}>
+      <View
+        {...props}
+        style={[
+          styles.pixel,
+          {
+            backgroundColor: `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.a})`,
+          },
+        ]}
+      >
+        <CheckBox style={styles.checkBox} value={pixel.selected} />
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
