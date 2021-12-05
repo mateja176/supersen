@@ -32,6 +32,7 @@
     "react-native-root-toast": "^3.3.0",
     "react-native-web": "^0.17.1",
     "react-query": "^3.32.1",
+    "tinycolor2": "^1.4.2",
     "zod": "^3.11.6"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "@types/react": "~17.0.21",
     "@types/react-color": "^3.0.6",
     "@types/react-native": "~0.64.12",
+    "@types/tinycolor2": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "concurrently": "^6.3.0",
