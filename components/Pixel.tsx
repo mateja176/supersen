@@ -6,7 +6,7 @@ import {
   ViewProps,
 } from 'react-native';
 import { CheckBox } from 'react-native-web';
-import { IPixel } from '../hooks/pixels';
+import { IPixel } from '../models/pixels';
 
 const styles = StyleSheet.create({
   pixel: {
