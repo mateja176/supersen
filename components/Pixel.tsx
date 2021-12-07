@@ -1,8 +1,8 @@
 import React from 'react';
 import { Pressable, PressableProps, StyleSheet, ViewStyle } from 'react-native';
-import { CheckBox } from 'react-native-web';
 import useTheme from '../hooks/theme';
 import { IPixel } from '../models/pixels';
+import CheckBox from './Checkbox';
 
 const styles = StyleSheet.create({
   pixel: {
@@ -13,8 +13,8 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
   },
   checkBox: {
-    top: '5%',
-    right: '5%',
+    top: 8,
+    right: 8,
     position: 'absolute',
   },
 });
@@ -87,7 +87,7 @@ const Pixel: React.FC<PixelProps> = ({
         },
       ]}
     >
-      <CheckBox style={styles.checkBox} value={pixel.selected} />
+      <CheckBox style={styles.checkBox} checked={pixel.selected} />
     </Pressable>
   );
 };
