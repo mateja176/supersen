@@ -13,7 +13,6 @@ import useLayout from '../hooks/useLayout';
 import { IPixel } from '../models/pixels';
 import * as services from '../services/pixels';
 import { initialColor, pixelsRange } from '../utils/pixels';
-import Button from './Button';
 import ButtonGroup from './ButtonGroup';
 import ColorPicker from './ColorPicker/ColorPicker';
 import Grow from './Grow';
@@ -74,11 +73,14 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
   const toggleColorPicker = () => {
-    setColorPickerVisible((visible) => !visible);
+    setColorPickerVisible((visible) => {
+      return !visible;
+    });
   };
-  const { layoutRef, onLayout } = useLayout();
+  const colorPickerWrapperLayout = useLayout();
 
-  const { pixels, currentColor, setPixels, setColor, setChannel } = usePixels();
+  const { pixels, currentColor, setPixels, setSelected, setColor, setChannel } =
+    usePixels();
 
   const handleToggle = React.useCallback(
     (i: number) => {
@@ -121,6 +123,25 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     setPixelsMutation.mutateAsync(pixels).catch(handleError);
   };
 
+  const { allSelected, noneSelected } = React.useMemo(() => {
+    const selectedCount = pixels.reduce(
+      (selectedCount1, pixel) =>
+        pixel.selected ? selectedCount1 + 1 : selectedCount1,
+      0,
+    );
+    return {
+      allSelected: selectedCount === pixels.length,
+      noneSelected: selectedCount === 0,
+    };
+  }, [pixels]);
+
+  const selectAll = () => {
+    setSelected(true);
+  };
+  const deselectAll = () => {
+    setSelected(false);
+  };
+
   return (
     <View
       style={{
@@ -135,7 +156,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
         })}
         <Grow
           style={styles.grow}
-          layoutRef={layoutRef}
+          layoutRef={colorPickerWrapperLayout.layoutRef}
           visible={colorPickerVisible}
         >
           <View
@@ -145,7 +166,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
                 backgroundColor: theme.colors.bg.white,
               },
             ]}
-            onLayout={onLayout}
+            onLayout={colorPickerWrapperLayout.onLayout}
           >
             <ColorPicker
               color={currentColor ?? initialColor}
@@ -158,22 +179,42 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
       <ButtonGroup>
         <IconButton
+          onPress={deselectAll}
+          disabled={noneSelected}
+          iconName="close"
+          backgroundColor={theme.colors.bg.dark}
+        >
+          Deselect All
+        </IconButton>
+        <IconButton
+          onPress={selectAll}
+          disabled={allSelected}
+          iconName="checkmark"
+          backgroundColor={theme.colors.bg.success}
+        >
+          Select All
+        </IconButton>
+        <IconButton
           onPress={toggleColorPicker}
+          disabled={!currentColor}
           iconName={colorPickerVisible ? 'eye-off' : 'eye'}
           backgroundColor={
             colorPickerVisible
               ? theme.colors.bg.secondary
-              : theme.colors.bg.success
+              : theme.colors.bg.info
           }
-          disabled={!currentColor}
         >
           Color
         </IconButton>
-        <Button
-          disabled={setPixelsMutation.isLoading}
+        <IconButton
           onPress={handlePress}
-          title="Submit"
-        />
+          disabled={setPixelsMutation.isLoading}
+          iconName={
+            setPixelsMutation.isLoading ? 'timer-outline' : 'arrow-forward'
+          }
+        >
+          Submit
+        </IconButton>
       </ButtonGroup>
     </View>
   );

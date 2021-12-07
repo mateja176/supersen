@@ -5,7 +5,8 @@ import { initialPixels } from '../utils/pixels';
 export interface PixelsContext {
   pixels: IPixel[];
   currentColor: Color | null;
-  setSelected: (indexes: number[]) => void;
+  setSelectedIndexes: (indexes: number[]) => void;
+  setSelected: (selected: boolean) => void;
   setPixels: React.Dispatch<React.SetStateAction<IPixel[]>>;
   setColor: (color: Color) => void;
   setChannel: (withChannel: WithChannel) => void;
@@ -17,12 +18,21 @@ const usePixels = (): PixelsContext => {
     return pixels.find(({ selected }) => selected) ?? null;
   }, [pixels]);
 
-  const setSelected: PixelsContext['setSelected'] = React.useCallback(
-    (indexes) => {
+  const setSelectedIndexes: PixelsContext['setSelectedIndexes'] =
+    React.useCallback((indexes) => {
       setPixels((pixels1) =>
         pixels1.map((pixel, i) => ({
           ...pixel,
           selected: indexes.includes(i),
+        })),
+      );
+    }, []);
+  const setSelected: PixelsContext['setSelected'] = React.useCallback(
+    (selected) => {
+      setPixels((pixels1) =>
+        pixels1.map((pixel) => ({
+          ...pixel,
+          selected,
         })),
       );
     },
@@ -54,6 +64,7 @@ const usePixels = (): PixelsContext => {
   return {
     pixels,
     currentColor,
+    setSelectedIndexes,
     setSelected,
     setPixels,
     setColor,

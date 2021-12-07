@@ -15,10 +15,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100%',
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   text: {
     marginLeft: 8,
-    textTransform: 'uppercase',
   },
 });
 
