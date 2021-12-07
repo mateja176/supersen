@@ -42,7 +42,7 @@ const Pixel: React.FC<PixelProps> = ({
   marginBottom,
   ...props
 }) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   const outlineStyle = {
     outlineWidth: isRangeSelectIndex ? 2 : 0,

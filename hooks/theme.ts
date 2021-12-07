@@ -1,9 +1,14 @@
-import { useTheme as useEmotionTheme } from '@emotion/react';
-import { Theme } from '../utils/theme';
+import create from 'zustand';
+import theme, { Theme } from '../utils/theme';
 
-const useTheme = (): Theme => {
-  const theme = useEmotionTheme();
-  return theme as Theme;
-};
+export interface ThemeStore {
+  theme: Theme;
+  setTheme: (partialTheme: Partial<Theme>) => void;
+}
+const useTheme = create<ThemeStore>((set) => ({
+  theme,
+  setTheme: (partialTheme) =>
+    set((currentTheme) => ({ ...currentTheme, ...partialTheme })),
+}));
 
 export default useTheme;

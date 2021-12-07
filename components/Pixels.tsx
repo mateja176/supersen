@@ -53,7 +53,7 @@ export interface PixelsProps {}
 const Pixels: React.FC<PixelsProps> = (props) => {
   const dimensions = useWindowDimensions();
 
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   const setPixelsMutation = useMutation(services.setPixels, {
     onSuccess: () => {

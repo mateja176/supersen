@@ -5,7 +5,7 @@ import useTheme from '../hooks/theme';
 export interface ButtonProps extends ButtonProps1 {}
 
 const Button: React.FC<ButtonProps> = ({ color, ...props }) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return <RNButton {...props} color={color ?? theme.colors.bg.primary} />;
 };
 

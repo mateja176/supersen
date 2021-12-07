@@ -66,7 +66,7 @@ export interface SliderProps extends Pick<ViewStyle, 'height'> {
 }
 
 const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   const isChangingRef = React.useRef(false);
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);

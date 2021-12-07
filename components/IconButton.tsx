@@ -36,7 +36,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   backgroundColor,
   ...props
 }) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   const textColor = color ?? theme.colors.text.white;
 

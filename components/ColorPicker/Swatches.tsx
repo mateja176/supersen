@@ -41,7 +41,7 @@ export interface SwatchesProps {
 }
 
 const Swatches: React.FC<SwatchesProps> = (props) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   return (
     <ScrollView horizontal contentContainerStyle={styles.wrapper}>
