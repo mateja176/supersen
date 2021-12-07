@@ -1,11 +1,6 @@
 import React from 'react';
-import {
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-  ViewProps,
-} from 'react-native';
-import { CheckBox } from 'react-native-web';
+import { Pressable, StyleSheet } from 'react-native';
+import { CheckBox, PressableProps } from 'react-native-web';
 import { IPixel } from '../models/pixels';
 
 const styles = StyleSheet.create({
@@ -26,26 +21,25 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface PixelProps extends ViewProps {
+export interface PixelProps extends PressableProps {
   pixel: IPixel;
   onToggle: () => void;
 }
 
 const Pixel: React.FC<PixelProps> = ({ pixel, onToggle, ...props }) => {
   return (
-    <TouchableWithoutFeedback onPress={onToggle}>
-      <View
-        {...props}
-        style={[
-          styles.pixel,
-          {
-            backgroundColor: `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.a})`,
-          },
-        ]}
-      >
-        <CheckBox style={styles.checkBox} value={pixel.selected} />
-      </View>
-    </TouchableWithoutFeedback>
+    <Pressable
+      {...props}
+      style={[
+        styles.pixel,
+        {
+          backgroundColor: `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.a})`,
+        },
+      ]}
+      onPress={onToggle}
+    >
+      <CheckBox style={styles.checkBox} value={pixel.selected} />
+    </Pressable>
   );
 };
 

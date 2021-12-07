@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
+  Pressable,
+  PressableProps,
   StyleSheet,
   Text,
-  TouchableHighlight,
-  TouchableHighlightProps,
   View,
 } from 'react-native';
 import useTheme from '../hooks/theme';
@@ -23,8 +23,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface IconButtonProps
-  extends Omit<TouchableHighlightProps, 'children'> {
+export interface IconButtonProps extends Omit<PressableProps, 'children'> {
   iconName: React.ComponentProps<typeof Ionicons>['name'];
   children?: string;
   color?: string;
@@ -36,7 +35,6 @@ const IconButton: React.FC<IconButtonProps> = ({
   iconName,
   color,
   backgroundColor,
-  style,
   ...props
 }) => {
   const theme = useTheme();
@@ -44,14 +42,12 @@ const IconButton: React.FC<IconButtonProps> = ({
   const textColor = color ?? theme.colors.text.white;
 
   return (
-    <TouchableHighlight
+    <Pressable
       style={[
         {
-          height: '100%',
           backgroundColor: backgroundColor ?? theme.colors.bg.primary,
           opacity: props.disabled ? 0.5 : 1,
         },
-        style,
       ]}
       {...props}
     >
@@ -70,7 +66,7 @@ const IconButton: React.FC<IconButtonProps> = ({
           </Text>
         )}
       </View>
-    </TouchableHighlight>
+    </Pressable>
   );
 };
 

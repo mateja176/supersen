@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import tinycolor from 'tinycolor2';
 import { Color } from '../../models/pixels';
 
@@ -49,14 +44,14 @@ const Swatches: React.FC<SwatchesProps> = (props) => {
   return (
     <ScrollView horizontal contentContainerStyle={styles.wrapper}>
       {swatches.map((swatch) => (
-        <TouchableWithoutFeedback
+        <Pressable
           key={swatch}
           onPress={() => {
             props.onChange(tinycolor(swatch).toRgb());
           }}
         >
           <View style={[styles.swatch, { backgroundColor: swatch }]} />
-        </TouchableWithoutFeedback>
+        </Pressable>
       ))}
     </ScrollView>
   );
