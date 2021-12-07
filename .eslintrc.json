@@ -16,7 +16,8 @@
     "@typescript-eslint/no-unused-vars": [
       "warn",
       { "argsIgnorePattern": "^props$" }
-    ]
+    ],
+    "react/self-closing-comp": "warn"
   },
   "settings": {
     "import/ignore": ["react-native"]

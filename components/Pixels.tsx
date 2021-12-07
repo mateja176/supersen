@@ -52,6 +52,14 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const theme = useTheme();
 
+  const setPixelsMutation = useMutation(services.setPixels, {
+    onSuccess: () => {
+      Toast.show('Pixels Updated!', {
+        backgroundColor: theme.colors.bg.success,
+        duration: Toast.durations.SHORT,
+      });
+    },
+  });
   const handleError = (error: unknown) => {
     Toast.show(
       `Update Failed: ${isError(error) ? error.message : 'Unknown reason'}`,
@@ -61,19 +69,12 @@ const Pixels: React.FC<PixelsProps> = (props) => {
       },
     );
   };
-
-  const setPixelsMutation = useMutation(services.setPixels, {
-    onSuccess: () => {
-      Toast.show('Pixels Updated!', {
-        backgroundColor: theme.colors.bg.success,
-        duration: Toast.durations.SHORT,
-      });
-    },
-  });
-
-  const [rangeSelectIndex, setRangeSelectIndex] = React.useState<number | null>(
-    null,
-  );
+  React.useEffect(() => {
+    setPixelsMutation.mutateAsync(pixels).catch(handleError);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const handlePress = () => {
+    setPixelsMutation.mutateAsync(pixels).catch(handleError);
+  };
 
   const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
   const toggleColorPicker = () => {
@@ -83,6 +84,9 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   };
   const colorPickerWrapperLayout = useLayout();
 
+  const [rangeSelectIndex, setRangeSelectIndex] = React.useState<number | null>(
+    null,
+  );
   const {
     pixels,
     currentColor,
@@ -92,7 +96,6 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     setColor,
     setChannel,
   } = usePixels();
-
   const handleToggle = React.useCallback(
     (i: number) => {
       return setPixels((pixels) => {
@@ -125,14 +128,6 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     },
     [setPixels],
   );
-
-  React.useEffect(() => {
-    setPixelsMutation.mutateAsync(pixels).catch(handleError);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handlePress = () => {
-    setPixelsMutation.mutateAsync(pixels).catch(handleError);
-  };
 
   const { allSelected, noneSelected } = React.useMemo(() => {
     const selectedCount = pixels.reduce(
