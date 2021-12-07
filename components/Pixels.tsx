@@ -26,14 +26,16 @@ const initialPixelsAndStatus: { deselected: boolean; pixels: IPixel[] } = {
 };
 
 const styles = StyleSheet.create({
-  pixels: {
+  wrapper: {
     position: 'relative',
+  },
+  pixels: {
     flexWrap: 'wrap',
     flexDirection: 'row',
   },
   grow: {
     width: '100%',
-    position: 'sticky' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    position: 'absolute', // eslint-disable-line @typescript-eslint/no-explicit-any
     bottom: 0,
     alignItems: 'center',
     paddingLeft: `${pixelsX}%`,
@@ -77,13 +79,14 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     setPixelsMutation.mutateAsync(pixels).catch(handleError);
   };
 
+  const buttonGroupLayout = useLayout();
+  const colorPickerWrapperLayout = useLayout();
   const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
   const toggleColorPicker = () => {
     setColorPickerVisible((visible) => {
       return !visible;
     });
   };
-  const colorPickerWrapperLayout = useLayout();
 
   const [rangeSelectIndex, setRangeSelectIndex] = React.useState<number | null>(
     null,
@@ -153,9 +156,12 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   return (
     <View
-      style={{
-        height: dimensions.height,
-      }}
+      style={[
+        styles.wrapper,
+        {
+          height: dimensions.height,
+        },
+      ]}
     >
       <ScrollView contentContainerStyle={styles.pixels} scrollEnabled>
         {pixelsRange.map((i) => {
@@ -191,30 +197,37 @@ const Pixels: React.FC<PixelsProps> = (props) => {
             />
           );
         })}
-        <Grow
-          style={styles.grow}
-          layoutRef={colorPickerWrapperLayout.layoutRef}
-          visible={colorPickerVisible}
-        >
-          <View
-            style={[
-              styles.colorPickerWrapper,
-              {
-                backgroundColor: theme.colors.bg.white,
-              },
-            ]}
-            onLayout={colorPickerWrapperLayout.onLayout}
-          >
-            <ColorPicker
-              color={currentColor ?? initialColor}
-              onChange={setColor}
-              onChannelChange={setChannel}
-            />
-          </View>
-        </Grow>
       </ScrollView>
 
-      <ButtonGroup>
+      <Grow
+        style={[
+          styles.grow,
+          {
+            backgroundColor: theme.colors.bg.white,
+            bottom: buttonGroupLayout.layoutRef.current?.height ?? 0,
+          },
+        ]}
+        layoutRef={colorPickerWrapperLayout.layoutRef}
+        visible={colorPickerVisible}
+      >
+        <View
+          style={[
+            styles.colorPickerWrapper,
+            {
+              backgroundColor: theme.colors.bg.white,
+            },
+          ]}
+          onLayout={colorPickerWrapperLayout.onLayout}
+        >
+          <ColorPicker
+            color={currentColor ?? initialColor}
+            onChange={setColor}
+            onChannelChange={setChannel}
+          />
+        </View>
+      </Grow>
+
+      <ButtonGroup onLayout={buttonGroupLayout.onLayout}>
         <IconButton
           onPress={deselectAll}
           disabled={noneSelected}
