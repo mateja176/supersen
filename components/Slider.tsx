@@ -83,9 +83,9 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
       /**
        * scaled / max = position / width
        */
-      const scaled = Math.round(
-        (currentPosition * props.max) / (layoutRef.current?.width ?? 0),
-      );
+      const scaled = layoutRef.current
+        ? Math.round((currentPosition * props.max) / layoutRef.current.width)
+        : 0;
       return scaled;
     },
     [props.max],
@@ -93,14 +93,14 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
   const limitToLayout = React.useCallback((currentPosition: number) => {
     return layoutRef.current?.left && layoutRef.current?.width
       ? Math.min(
-          layoutRef.current?.left + layoutRef.current?.width,
+          layoutRef.current?.left + layoutRef.current.width,
           Math.max(layoutRef.current?.left, currentPosition),
         )
       : currentPosition;
   }, []);
   React.useEffect(() => {
-    if (!isChangingRef.current) {
-      setPosition((props.value * (layoutRef.current?.width ?? 0)) / props.max);
+    if (!isChangingRef.current && layoutRef.current) {
+      setPosition((props.value * layoutRef.current.width) / props.max);
     }
   }, [props.max, props.value]);
   const handleValueChange = React.useMemo(
@@ -125,18 +125,21 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
         isChangingRef.current = true;
       },
       onPanResponderMove: (e, gestureState) => {
-        const newCenterPosition =
-          limitToLayout(gestureState.x0 + gestureState.dx) -
-          (layoutRef.current?.left ?? 0);
+        const newCenterPosition = layoutRef.current
+          ? limitToLayout(gestureState.x0 + gestureState.dx) -
+            layoutRef.current.left
+          : 0;
         const scaled = scale(newCenterPosition);
         setPosition(newCenterPosition);
         handleValueChange(scaled);
       },
       onPanResponderRelease: (e, gestureState) => {
-        const scaled = scale(
-          limitToLayout(gestureState.x0 + gestureState.dx) -
-            (layoutRef.current?.left ?? 0),
-        );
+        const scaled = layoutRef.current
+          ? scale(
+              limitToLayout(gestureState.x0 + gestureState.dx) -
+                layoutRef.current.left,
+            )
+          : 0;
 
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
