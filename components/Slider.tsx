@@ -1,4 +1,4 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient, LinearGradientProps } from 'expo-linear-gradient';
 import React from 'react';
 import {
   LayoutChangeEvent,
@@ -56,27 +56,17 @@ const onMoveShouldSetPanResponder = () => true;
 const onMoveShouldSetPanResponderCapture = () => true;
 const onPanResponderTerminationRequest = () => false;
 
-export interface SliderProps
-  extends Pick<ViewStyle, 'height'>,
-    Pick<React.CSSProperties, 'color'> {
+export interface SliderProps extends Pick<ViewStyle, 'height'> {
   value: number;
   max: number;
   onChange: React.Dispatch<number>;
-  knobColor: React.CSSProperties['color'];
-  backgroundColor?:
-    | React.CSSProperties['color']
-    | Array<NonNullable<React.CSSProperties['color']>>;
+  knobColor: ViewStyle['backgroundColor'];
+  backgroundColor: ViewStyle['backgroundColor'] | LinearGradientProps['colors'];
+  color?: ViewStyle['backgroundColor'];
 }
 
-const Slider: React.FC<SliderProps> = ({
-  height = 4,
-  backgroundColor = '#eee',
-  max = 100,
-  ...props
-}) => {
+const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
   const theme = useTheme();
-
-  const { knobColor = 'lightsteelblue', color = 'lightsteelblue' } = props;
 
   const isChangingRef = React.useRef(false);
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -84,7 +74,7 @@ const Slider: React.FC<SliderProps> = ({
   const layoutRef = React.useRef<LayoutRectangle | null>(null);
   const handleLayout = ({ nativeEvent }: LayoutChangeEvent) => {
     layoutRef.current = nativeEvent.layout;
-    const position = (props.value * nativeEvent.layout.width) / max;
+    const position = (props.value * nativeEvent.layout.width) / props.max;
     setPosition(position);
   };
   const [position, setPosition] = React.useState(0);
@@ -94,11 +84,11 @@ const Slider: React.FC<SliderProps> = ({
        * scaled / max = position / width
        */
       const scaled = Math.round(
-        (currentPosition * max) / (layoutRef.current?.width ?? 0),
+        (currentPosition * props.max) / (layoutRef.current?.width ?? 0),
       );
       return scaled;
     },
-    [max],
+    [props.max],
   );
   const limitToLayout = React.useCallback((currentPosition: number) => {
     return layoutRef.current?.left && layoutRef.current?.width
@@ -110,9 +100,9 @@ const Slider: React.FC<SliderProps> = ({
   }, []);
   React.useEffect(() => {
     if (!isChangingRef.current) {
-      setPosition((props.value * (layoutRef.current?.width ?? 0)) / max);
+      setPosition((props.value * (layoutRef.current?.width ?? 0)) / props.max);
     }
-  }, [max, props.value]);
+  }, [props.max, props.value]);
   const handleValueChange = React.useMemo(
     () =>
       throttle({
@@ -162,18 +152,26 @@ const Slider: React.FC<SliderProps> = ({
   return (
     <View style={styles.wrapper}>
       <View style={styles.sliderWrapper} onLayout={handleLayout}>
-        {Array.isArray(backgroundColor) ? (
-          <LinearGradient colors={backgroundColor} end={linearGradientEnd}>
+        {Array.isArray(props.backgroundColor) ? (
+          <LinearGradient
+            colors={props.backgroundColor}
+            end={linearGradientEnd}
+          >
             <View style={[styles.track, { height }]} />
           </LinearGradient>
         ) : (
-          <View style={[styles.track, { height, backgroundColor }]} />
+          <View
+            style={[
+              styles.track,
+              { height, backgroundColor: props.backgroundColor },
+            ]}
+          />
         )}
         {props.color && (
           <View
             style={[
               styles.fill,
-              { height, backgroundColor: color, width: position },
+              { height, backgroundColor: props.color, width: position },
             ]}
           />
         )}
@@ -183,7 +181,7 @@ const Slider: React.FC<SliderProps> = ({
             styles.knob,
             {
               borderColor: theme.colors.bg.secondary,
-              backgroundColor: knobColor ?? color,
+              backgroundColor: props.knobColor,
               left: position - halfKnobSize,
             },
           ]}
