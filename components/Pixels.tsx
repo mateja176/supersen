@@ -11,6 +11,7 @@ import usePixels from '../hooks/pixels';
 import useTheme from '../hooks/theme';
 import useLayout from '../hooks/useLayout';
 import { IPixel } from '../models/pixels';
+import { pixelsX } from '../services/env';
 import * as services from '../services/pixels';
 import { initialColor, pixelsRange } from '../utils/pixels';
 import ButtonGroup from './ButtonGroup';
@@ -27,16 +28,16 @@ const initialPixelsAndStatus: { deselected: boolean; pixels: IPixel[] } = {
 const styles = StyleSheet.create({
   pixels: {
     position: 'relative',
-    paddingTop: '5%',
-    paddingLeft: '5%',
     flexWrap: 'wrap',
     flexDirection: 'row',
   },
   grow: {
-    width: '95%',
+    width: '100%',
     position: 'sticky' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     bottom: 0,
     alignItems: 'center',
+    paddingLeft: `${pixelsX}%`,
+    paddingRight: `${pixelsX}%`,
   },
   colorPickerWrapper: {
     width: '100%',
@@ -143,9 +144,11 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const selectAll = () => {
     setSelected(true);
+    setColorPickerVisible(true);
   };
   const deselectAll = () => {
     setSelected(false);
+    setColorPickerVisible(false);
   };
 
   return (
@@ -163,6 +166,10 @@ const Pixels: React.FC<PixelsProps> = (props) => {
               key={i}
               pixel={pixels[i]}
               isRangeSelectIndex={isRangeSelectIndex}
+              marginRight={`${pixelsX}%`}
+              marginLeft={i % pixelsX === 0 ? `${pixelsX}%` : 0}
+              marginTop={i < pixelsX ? `${pixelsX}%` : 0}
+              marginBottom={`${pixelsX}%`}
               onPress={() => {
                 if (rangeSelectIndex === null) {
                   handleToggle(i);

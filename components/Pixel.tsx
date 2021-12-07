@@ -1,13 +1,11 @@
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
-import { CheckBox, PressableProps } from 'react-native-web';
+import { Pressable, StyleSheet, PressableProps, ViewStyle } from 'react-native';
+import { CheckBox } from 'react-native-web';
 import useTheme from '../hooks/theme';
 import { IPixel } from '../models/pixels';
 
 const styles = StyleSheet.create({
   pixel: {
-    marginRight: '5%',
-    marginBottom: '5%',
     width: '20%',
     paddingTop: '20%',
     position: 'relative',
@@ -21,7 +19,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface PixelProps extends PressableProps {
+export interface PixelProps
+  extends PressableProps,
+    Pick<
+      ViewStyle,
+      'marginLeft' | 'marginRight' | 'marginTop' | 'marginBottom'
+    > {
   pixel: IPixel;
   isRangeSelectIndex: boolean;
   onPress: () => void;
@@ -33,6 +36,10 @@ const Pixel: React.FC<PixelProps> = ({
   isRangeSelectIndex,
   onPress,
   onLongPress,
+  marginLeft,
+  marginRight,
+  marginTop,
+  marginBottom,
   ...props
 }) => {
   const theme = useTheme();
@@ -49,6 +56,10 @@ const Pixel: React.FC<PixelProps> = ({
       style={[
         styles.pixel,
         {
+          marginLeft,
+          marginRight,
+          marginTop,
+          marginBottom,
           ...(isRangeSelectIndex ? { borderWidth: 0 } : {}),
           ...outlineStyle,
           borderColor: theme.colors.bg.secondary,

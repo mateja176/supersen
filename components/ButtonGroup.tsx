@@ -4,7 +4,6 @@ import { StyleSheet, View, ViewProps } from 'react-native';
 const styles = StyleSheet.create({
   buttonGroup: {
     flexDirection: 'row',
-    width: '100%',
   },
   children: {
     flexGrow: 1,
