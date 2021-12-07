@@ -188,6 +188,15 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
               left: position - halfKnobSize,
             },
           ]}
+          accessible
+          accessibilityLabel="Slider knob"
+          accessibilityHint="Move the knob to adjust the slider value"
+          accessibilityRole="adjustable"
+          accessibilityActions={[
+            { name: 'increment', label: 'Increment slider value' },
+            { name: 'decrement', label: 'Decrements slider value' },
+          ]}
+          accessibilityValue={{ min: 0, max: props.max, now: props.value }}
         />
       </View>
       <Text style={styles.label}>{scale(position)}</Text>

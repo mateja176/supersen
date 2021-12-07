@@ -22,7 +22,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface IconButtonProps extends Omit<PressableProps, 'children'> {
+export interface IconButtonProps
+  extends Omit<
+    PressableProps,
+    'children' | 'accessible' | 'accessibilityLabel'
+  > {
   iconName: React.ComponentProps<typeof Ionicons>['name'];
   children?: string;
   color?: string;
@@ -42,13 +46,15 @@ const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <Pressable
+      {...props}
+      accessible
+      accessibilityLabel={children}
       style={[
         {
           backgroundColor: backgroundColor ?? theme.colors.bg.primary,
           opacity: props.disabled ? 0.5 : 1,
         },
       ]}
-      {...props}
     >
       <View style={styles.wrapper}>
         <Ionicons name={iconName} color={textColor} />

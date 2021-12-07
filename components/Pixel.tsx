@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, PressableProps, ViewStyle } from 'react-native';
+import { Pressable, PressableProps, StyleSheet, ViewStyle } from 'react-native';
 import { CheckBox } from 'react-native-web';
 import useTheme from '../hooks/theme';
 import { IPixel } from '../models/pixels';
@@ -20,7 +20,14 @@ const styles = StyleSheet.create({
 });
 
 export interface PixelProps
-  extends PressableProps,
+  extends Omit<
+      PressableProps,
+      | 'accessible'
+      | 'accessibilityLabel'
+      | 'accessibilityHint'
+      | 'accessibilityRole'
+      | 'accessibilityActions'
+    >,
     Pick<
       ViewStyle,
       'marginLeft' | 'marginRight' | 'marginTop' | 'marginBottom'
@@ -68,6 +75,17 @@ const Pixel: React.FC<PixelProps> = ({
       ]}
       onPress={onPress}
       onLongPress={onLongPress}
+      accessible
+      accessibilityLabel="Pixel"
+      accessibilityHint="Defines the color of the pixel on the device"
+      accessibilityRole="button"
+      accessibilityActions={[
+        { name: 'activate', label: 'Select the pixel to change its color' },
+        {
+          name: 'longpress',
+          label: 'Use the pixel as an anchor for range selection',
+        },
+      ]}
     >
       <CheckBox style={styles.checkBox} value={pixel.selected} />
     </Pressable>

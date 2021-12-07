@@ -1,5 +1,11 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  ScrollViewProps,
+  StyleSheet,
+  View,
+} from 'react-native';
 import tinycolor from 'tinycolor2';
 import useTheme from '../../hooks/theme';
 import { Color } from '../../models/pixels';
@@ -36,21 +42,32 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface SwatchesProps {
+export interface SwatchesProps extends ScrollViewProps {
   onChange: (color: Color) => void;
 }
 
-const Swatches: React.FC<SwatchesProps> = (props) => {
+const Swatches: React.FC<SwatchesProps> = ({ onChange, ...props }) => {
   const { theme } = useTheme();
 
   return (
-    <ScrollView horizontal contentContainerStyle={styles.wrapper}>
+    <ScrollView
+      horizontal
+      {...props}
+      contentContainerStyle={[props.contentContainerStyle, styles.wrapper]}
+    >
       {swatches.map((swatch) => (
         <Pressable
           key={swatch}
           onPress={() => {
-            props.onChange(tinycolor(swatch).toRgb());
+            onChange(tinycolor(swatch).toRgb());
           }}
+          accessible
+          accessibilityLabel="Swatch"
+          accessibilityHint="Part of predefined color palette"
+          accessibilityRole="button"
+          accessibilityActions={[
+            { name: 'activate', label: 'Set color to swatch color' },
+          ]}
         >
           <View
             style={[
