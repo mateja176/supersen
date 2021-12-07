@@ -2,15 +2,15 @@ import React from 'react';
 import { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 
 const useLayout = (): {
-  layout: LayoutRectangle | null;
+  layoutRef: React.MutableRefObject<LayoutRectangle | null>;
   onLayout: (layoutChangeEvent: LayoutChangeEvent) => void;
 } => {
-  const [layout, setLayout] = React.useState<LayoutRectangle | null>(null);
+  const layoutRef = React.useRef<LayoutRectangle | null>(null);
   const onLayout = ({ nativeEvent }: LayoutChangeEvent) => {
-    setLayout(nativeEvent.layout);
+    layoutRef.current = nativeEvent.layout;
   };
 
-  return { layout, onLayout };
+  return { layoutRef, onLayout };
 };
 
 export default useLayout;

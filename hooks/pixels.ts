@@ -1,42 +1,21 @@
 import React from 'react';
-import { RGBColor } from 'react-color';
-import { Color } from '../models/pixels';
-import { color } from '../services/env';
-import { pixelsRange } from '../utils/pixels';
+import { Color, IPixel, WithChannel } from '../models/pixels';
+import { initialPixels } from '../utils/pixels';
 
-export interface IPixel extends Color {
-  selected: boolean;
-}
-
-const [r, g, b] = color;
-
-const minimalAlpha = 0.01;
-const initialAlpha = 1;
-const initialColor: IPixel = {
-  r,
-  g,
-  b,
-  a: initialAlpha,
-  selected: false,
-};
-const initialPixels: IPixel[] = pixelsRange.flatMap((xRange) =>
-  xRange.map(() => initialColor),
-);
-
-const rgbColorToColor = ({ r, g, b, a = initialAlpha }: RGBColor) => ({
-  r,
-  g,
-  b,
-  a: a || minimalAlpha,
-});
 export interface PixelsContext {
   pixels: IPixel[];
+  currentColor: Color | null;
   setSelected: (indexes: number[]) => void;
-  toggleSelected: (index: number) => void;
-  setRgbColor: (rgbColor: RGBColor) => void;
+  setPixels: React.Dispatch<React.SetStateAction<IPixel[]>>;
+  setColor: (color: Color) => void;
+  setChannel: (withChannel: WithChannel) => void;
 }
 const usePixels = (): PixelsContext => {
   const [pixels, setPixels] = React.useState(initialPixels);
+
+  const currentColor = React.useMemo(() => {
+    return pixels.find(({ selected }) => selected) ?? null;
+  }, [pixels]);
 
   const setSelected: PixelsContext['setSelected'] = React.useCallback(
     (indexes) => {
@@ -49,29 +28,37 @@ const usePixels = (): PixelsContext => {
     },
     [],
   );
-  const toggleSelected: PixelsContext['toggleSelected'] = React.useCallback(
-    (index) => {
-      setPixels((pixels1) =>
-        pixels1.map((pixel, i) =>
-          i === index ? { ...pixel, selected: !pixel.selected } : pixel,
-        ),
-      );
-    },
-    [],
-  );
 
-  const setRgbColor: PixelsContext['setRgbColor'] = React.useCallback(
-    (rgbColor: RGBColor) => {
+  const setColor: PixelsContext['setColor'] = React.useCallback(
+    (color: Color) => {
       setPixels((pixels) => {
-        return pixels.map((pixel) =>
-          pixel.selected ? { ...pixel, ...rgbColorToColor(rgbColor) } : pixel,
-        );
+        return pixels.map((pixel) => {
+          return pixel.selected ? { ...pixel, ...color } : pixel;
+        });
       });
     },
     [],
   );
 
-  return { pixels, setSelected, toggleSelected, setRgbColor };
+  const setChannel: PixelsContext['setChannel'] = React.useCallback(
+    (withChannel) => {
+      return setPixels((pixels) => {
+        return pixels.map((pixel) => {
+          return pixel.selected ? { ...pixel, ...withChannel } : pixel;
+        });
+      });
+    },
+    [],
+  );
+
+  return {
+    pixels,
+    currentColor,
+    setSelected,
+    setPixels,
+    setColor,
+    setChannel,
+  };
 };
 
 export default usePixels;

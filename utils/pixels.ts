@@ -1,8 +1,24 @@
-import { pixelsX, pixelsY } from '../services/env';
+import { Color, IPixel } from '../models/pixels';
+import { color, pixelsX, pixelsY } from '../services/env';
 
 const xRange: number[] = Array(pixelsX).fill(0);
 const yRange: number[] = Array(pixelsY).fill(0);
-// * limited to two dimensions
-export const pixelsRange = yRange.map((_, i) =>
+export const pixelsRange = yRange.flatMap((_, i) =>
   xRange.map((_, j) => xRange.length * i + j),
+);
+
+const [r, g, b, a] = color;
+
+export const initialColor: Color = {
+  r,
+  g,
+  b,
+  a,
+};
+export const initialPixel: IPixel = {
+  ...initialColor,
+  selected: false,
+};
+export const initialPixels: IPixel[] = Array(pixelsRange.length).fill(
+  initialPixel,
 );
