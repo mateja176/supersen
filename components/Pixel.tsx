@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { CheckBox, PressableProps } from 'react-native-web';
+import useTheme from '../hooks/theme';
 import { IPixel } from '../models/pixels';
 
 const styles = StyleSheet.create({
@@ -11,7 +12,6 @@ const styles = StyleSheet.create({
     paddingTop: '20%',
     position: 'relative',
     borderWidth: 1,
-    borderColor: 'grey',
     borderStyle: 'solid',
   },
   checkBox: {
@@ -23,20 +23,40 @@ const styles = StyleSheet.create({
 
 export interface PixelProps extends PressableProps {
   pixel: IPixel;
-  onToggle: () => void;
+  isRangeSelectIndex: boolean;
+  onPress: () => void;
+  onLongPress: () => void;
 }
 
-const Pixel: React.FC<PixelProps> = ({ pixel, onToggle, ...props }) => {
+const Pixel: React.FC<PixelProps> = ({
+  pixel,
+  isRangeSelectIndex,
+  onPress,
+  onLongPress,
+  ...props
+}) => {
+  const theme = useTheme();
+
+  const outlineStyle = {
+    outlineWidth: isRangeSelectIndex ? 2 : 0,
+    outlineColor: theme.colors.bg.success,
+    outlineStyle: 'solid',
+  };
+
   return (
     <Pressable
       {...props}
       style={[
         styles.pixel,
         {
+          ...(isRangeSelectIndex ? { borderWidth: 0 } : {}),
+          ...outlineStyle,
+          borderColor: theme.colors.bg.secondary,
           backgroundColor: `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.a})`,
         },
       ]}
-      onPress={onToggle}
+      onPress={onPress}
+      onLongPress={onLongPress}
     >
       <CheckBox style={styles.checkBox} value={pixel.selected} />
     </Pressable>

@@ -2,32 +2,38 @@ import React from 'react';
 import { Color, IPixel, WithChannel } from '../models/pixels';
 import { initialPixels } from '../utils/pixels';
 
-export interface PixelsContext {
+export interface PixelsStore {
   pixels: IPixel[];
   currentColor: Color | null;
-  setSelectedIndexes: (indexes: number[]) => void;
+  selectRange: (startIndex: number, stopIndex: number) => void;
   setSelected: (selected: boolean) => void;
   setPixels: React.Dispatch<React.SetStateAction<IPixel[]>>;
   setColor: (color: Color) => void;
   setChannel: (withChannel: WithChannel) => void;
 }
-const usePixels = (): PixelsContext => {
+const usePixels = (): PixelsStore => {
   const [pixels, setPixels] = React.useState(initialPixels);
 
   const currentColor = React.useMemo(() => {
     return pixels.find(({ selected }) => selected) ?? null;
   }, [pixels]);
 
-  const setSelectedIndexes: PixelsContext['setSelectedIndexes'] =
-    React.useCallback((indexes) => {
+  const selectRange: PixelsStore['selectRange'] = React.useCallback(
+    (startIndex, stopIndex) => {
       setPixels((pixels1) =>
-        pixels1.map((pixel, i) => ({
-          ...pixel,
-          selected: indexes.includes(i),
-        })),
+        pixels1.map((pixel, i) =>
+          i >= startIndex && i <= stopIndex
+            ? {
+                ...pixel,
+                selected: true,
+              }
+            : pixel,
+        ),
       );
-    }, []);
-  const setSelected: PixelsContext['setSelected'] = React.useCallback(
+    },
+    [],
+  );
+  const setSelected: PixelsStore['setSelected'] = React.useCallback(
     (selected) => {
       setPixels((pixels1) =>
         pixels1.map((pixel) => ({
@@ -39,7 +45,7 @@ const usePixels = (): PixelsContext => {
     [],
   );
 
-  const setColor: PixelsContext['setColor'] = React.useCallback(
+  const setColor: PixelsStore['setColor'] = React.useCallback(
     (color: Color) => {
       setPixels((pixels) => {
         return pixels.map((pixel) => {
@@ -50,7 +56,7 @@ const usePixels = (): PixelsContext => {
     [],
   );
 
-  const setChannel: PixelsContext['setChannel'] = React.useCallback(
+  const setChannel: PixelsStore['setChannel'] = React.useCallback(
     (withChannel) => {
       return setPixels((pixels) => {
         return pixels.map((pixel) => {
@@ -64,7 +70,7 @@ const usePixels = (): PixelsContext => {
   return {
     pixels,
     currentColor,
-    setSelectedIndexes,
+    selectRange,
     setSelected,
     setPixels,
     setColor,

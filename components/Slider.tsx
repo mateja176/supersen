@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import useTheme from '../hooks/theme';
 import { throttle } from '../services/services';
 
 const halfKnobSize = 10;
@@ -36,7 +37,6 @@ const styles = StyleSheet.create({
     height: knobSize,
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: 'grey',
   },
   label: {
     /**
@@ -74,6 +74,8 @@ const Slider: React.FC<SliderProps> = ({
   max = 100,
   ...props
 }) => {
+  const theme = useTheme();
+
   const { knobColor = 'lightsteelblue', color = 'lightsteelblue' } = props;
 
   const isChangingRef = React.useRef(false);
@@ -180,6 +182,7 @@ const Slider: React.FC<SliderProps> = ({
           style={[
             styles.knob,
             {
+              borderColor: theme.colors.bg.secondary,
               backgroundColor: knobColor ?? color,
               left: position - halfKnobSize,
             },

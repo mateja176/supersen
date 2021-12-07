@@ -71,6 +71,10 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     },
   });
 
+  const [rangeSelectIndex, setRangeSelectIndex] = React.useState<number | null>(
+    null,
+  );
+
   const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
   const toggleColorPicker = () => {
     setColorPickerVisible((visible) => {
@@ -79,8 +83,15 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   };
   const colorPickerWrapperLayout = useLayout();
 
-  const { pixels, currentColor, setPixels, setSelected, setColor, setChannel } =
-    usePixels();
+  const {
+    pixels,
+    currentColor,
+    setPixels,
+    selectRange,
+    setSelected,
+    setColor,
+    setChannel,
+  } = usePixels();
 
   const handleToggle = React.useCallback(
     (i: number) => {
@@ -150,8 +161,32 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     >
       <ScrollView contentContainerStyle={styles.pixels} scrollEnabled>
         {pixelsRange.map((i) => {
+          const isRangeSelectIndex = i === rangeSelectIndex;
+
           return (
-            <Pixel key={i} pixel={pixels[i]} onToggle={() => handleToggle(i)} />
+            <Pixel
+              key={i}
+              pixel={pixels[i]}
+              isRangeSelectIndex={isRangeSelectIndex}
+              onPress={() => {
+                if (rangeSelectIndex === null) {
+                  handleToggle(i);
+                } else {
+                  selectRange(
+                    Math.min(i, rangeSelectIndex),
+                    Math.max(i, rangeSelectIndex),
+                  );
+                  setRangeSelectIndex(null);
+                }
+              }}
+              onLongPress={() => {
+                if (isRangeSelectIndex) {
+                  setRangeSelectIndex(null);
+                } else {
+                  setRangeSelectIndex(i);
+                }
+              }}
+            />
           );
         })}
         <Grow

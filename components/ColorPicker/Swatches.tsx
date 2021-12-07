@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import tinycolor from 'tinycolor2';
+import useTheme from '../../hooks/theme';
 import { Color } from '../../models/pixels';
 
 const swatches = [
@@ -30,7 +31,6 @@ const styles = StyleSheet.create({
     width: 20,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: 'grey',
     borderStyle: 'solid',
     marginRight: 4,
   },
@@ -41,6 +41,8 @@ export interface SwatchesProps {
 }
 
 const Swatches: React.FC<SwatchesProps> = (props) => {
+  const theme = useTheme();
+
   return (
     <ScrollView horizontal contentContainerStyle={styles.wrapper}>
       {swatches.map((swatch) => (
@@ -50,7 +52,15 @@ const Swatches: React.FC<SwatchesProps> = (props) => {
             props.onChange(tinycolor(swatch).toRgb());
           }}
         >
-          <View style={[styles.swatch, { backgroundColor: swatch }]} />
+          <View
+            style={[
+              styles.swatch,
+              {
+                borderColor: theme.colors.bg.secondary,
+                backgroundColor: swatch,
+              },
+            ]}
+          />
         </Pressable>
       ))}
     </ScrollView>
