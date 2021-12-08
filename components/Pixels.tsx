@@ -196,8 +196,8 @@ const Pixels: React.FC<PixelsProps> = (props) => {
               style={{
                 marginRight: '4%',
                 marginLeft: i % pixelsX === 0 ? '4%' : 0,
-                marginTop: i < pixelsX ? '4%' : 0,
-                marginBottom: '4%',
+                marginTop: '4%',
+                marginBottom: i > pixelsRange.length - 5 ? '50%' : 0,
               }}
               onPress={() => {
                 if (rangeSelectIndex === null) {

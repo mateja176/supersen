@@ -1,17 +1,16 @@
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
-import Slider from '../Slider';
-import tinycolor from 'tinycolor2';
-import { ColorFormats } from 'tinycolor2';
+import tinycolor, { ColorFormats } from 'tinycolor2';
 import { Color, WithChannel } from '../../models/pixels';
+import Slider from '../Slider';
 import ColorSlider from './ColorSlider';
 import Swatches from './Swatches';
 
 const styles = StyleSheet.create({
-  swatchesWrapper: {
+  sliderLayout: {
     marginTop: 10,
   },
-  sliderWrapper: {
+  swatchesLayout: {
     marginTop: 10,
   },
 });
@@ -67,52 +66,47 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
             tinycolor({ ...rgbColor, r: 255 }).toRgbString(),
           ]}
         />
-        <View style={styles.sliderWrapper}>
-          <ColorSlider
-            value={rgbColor.g}
-            onValueChange={handleGreenChange}
-            knobColor="lightgreen"
-            backgroundColor={[
-              tinycolor({ ...rgbColor, g: 0 }).toRgbString(),
-              tinycolor({ ...rgbColor, g: 255 }).toRgbString(),
-            ]}
-          />
-        </View>
-        <View style={styles.sliderWrapper}>
-          <ColorSlider
-            value={rgbColor.b}
-            onValueChange={handleBlueChange}
-            knobColor="lightblue"
-            backgroundColor={[
-              tinycolor({ ...rgbColor, b: 0 }).toRgbString(),
-              tinycolor({ ...rgbColor, b: 255 }).toRgbString(),
-            ]}
-          />
-        </View>
-        <View style={styles.sliderWrapper}>
-          <Slider
-            max={100}
-            value={rgbColor.a * 100}
-            onValueChange={handleAlphaChange}
-            knobColor="white"
-            backgroundColor={[
-              'transparent',
-              /**
-               * in order to the preserve ordinal alpha spectrum
-               */
-              tinycolor({
-                r: rgbColor.r,
-                g: rgbColor.g,
-                b: rgbColor.b,
-              }).toRgbString(),
-            ]}
-          />
-        </View>
+        <ColorSlider
+          value={rgbColor.g}
+          onValueChange={handleGreenChange}
+          style={styles.sliderLayout}
+          knobColor="lightgreen"
+          backgroundColor={[
+            tinycolor({ ...rgbColor, g: 0 }).toRgbString(),
+            tinycolor({ ...rgbColor, g: 255 }).toRgbString(),
+          ]}
+        />
+        <ColorSlider
+          value={rgbColor.b}
+          onValueChange={handleBlueChange}
+          style={styles.sliderLayout}
+          knobColor="lightblue"
+          backgroundColor={[
+            tinycolor({ ...rgbColor, b: 0 }).toRgbString(),
+            tinycolor({ ...rgbColor, b: 255 }).toRgbString(),
+          ]}
+        />
+        <Slider
+          max={100}
+          value={rgbColor.a * 100}
+          onValueChange={handleAlphaChange}
+          style={styles.sliderLayout}
+          knobColor="white"
+          backgroundColor={[
+            'transparent',
+            /**
+             * in order to the preserve ordinal alpha spectrum
+             */
+            tinycolor({
+              r: rgbColor.r,
+              g: rgbColor.g,
+              b: rgbColor.b,
+            }).toRgbString(),
+          ]}
+        />
       </View>
 
-      <View style={styles.swatchesWrapper}>
-        <Swatches onChange={onChange} />
-      </View>
+      <Swatches onChange={onChange} style={styles.swatchesLayout} />
     </View>
   );
 };

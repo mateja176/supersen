@@ -67,6 +67,7 @@ export interface SliderProps extends Pick<ViewStyle, 'height'> {
   onValueChange: React.Dispatch<number>;
   color?: ViewStyle['backgroundColor'];
   style?: StyleProp<ViewStyle>;
+  showValue?: boolean;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -78,6 +79,7 @@ const Slider: React.FC<SliderProps> = ({
   color,
   style,
   height = 4,
+  showValue = true,
   ...props
 }) => {
   const { theme } = useTheme();
@@ -224,7 +226,7 @@ const Slider: React.FC<SliderProps> = ({
           accessibilityValue={{ min: 0, max, now: value }}
         />
       </Pressable>
-      <Text style={styles.label}>{scale(position)}</Text>
+      {showValue && <Text style={styles.label}>{scale(position)}</Text>}
     </View>
   );
 };
