@@ -1,4 +1,5 @@
 import React from 'react';
+import tinycolor from 'tinycolor2';
 import { Color, IPixel, WithChannel } from '../models/pixels';
 import { initialPixels } from '../utils/pixels';
 
@@ -15,7 +16,7 @@ const usePixels = (): PixelsStore => {
   const [pixels, setPixels] = React.useState(initialPixels);
 
   const currentColor = React.useMemo(() => {
-    return pixels.find(({ selected }) => selected) ?? null;
+    return pixels.find(({ selected }) => selected)?.color ?? null;
   }, [pixels]);
 
   const selectRange: PixelsStore['selectRange'] = React.useCallback(
@@ -49,7 +50,7 @@ const usePixels = (): PixelsStore => {
     (color: Color) => {
       setPixels((pixels) => {
         return pixels.map((pixel) => {
-          return pixel.selected ? { ...pixel, ...color } : pixel;
+          return pixel.selected ? { ...pixel, color } : pixel;
         });
       });
     },
@@ -60,7 +61,9 @@ const usePixels = (): PixelsStore => {
     (withChannel) => {
       return setPixels((pixels) => {
         return pixels.map((pixel) => {
-          return pixel.selected ? { ...pixel, ...withChannel } : pixel;
+          const rgbColor = pixel.color.toRgb();
+          const color = tinycolor({ ...rgbColor, ...withChannel });
+          return pixel.selected ? { ...pixel, color } : pixel;
         });
       });
     },

@@ -1,4 +1,4 @@
-import { ColorFormats } from 'tinycolor2';
+import tinycolor, { ColorFormats } from 'tinycolor2';
 import { z } from 'zod';
 
 export const Int = z.number().int().min(1);
@@ -8,16 +8,17 @@ export const AlphaChannel = z.number().min(0).max(1);
 
 export const ColorTuple = z.tuple([Channel, Channel, Channel, AlphaChannel]);
 
-export type Color = ColorFormats.RGBA;
+export type Color = tinycolor.Instance;
 
-export interface IPixel extends Color {
+export interface IPixel {
+  color: Color;
   selected: boolean;
 }
 
 export const Status = z.object({ status: z.number().int().min(0).max(1) });
 
 export type WithChannel =
-  | Pick<Color, 'r'>
-  | Pick<Color, 'g'>
-  | Pick<Color, 'b'>
-  | Pick<Color, 'a'>;
+  | Pick<ColorFormats.RGBA, 'r'>
+  | Pick<ColorFormats.RGBA, 'g'>
+  | Pick<ColorFormats.RGBA, 'b'>
+  | Pick<ColorFormats.RGBA, 'a'>;

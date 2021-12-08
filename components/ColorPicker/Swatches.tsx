@@ -63,7 +63,7 @@ const Swatches: React.FC<SwatchesProps> = ({
         <Pressable
           key={swatch}
           onPress={() => {
-            onChange(tinycolor(swatch).toRgb());
+            onChange(tinycolor(swatch));
           }}
           accessible
           accessibilityLabel="Swatch"

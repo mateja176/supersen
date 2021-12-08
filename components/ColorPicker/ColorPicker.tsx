@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
+import tinycolor, { ColorFormats } from 'tinycolor2';
 import { Color, WithChannel } from '../../models/pixels';
 import Slider from '../Slider';
 import ColorSlider from './ColorSlider';
@@ -27,73 +28,82 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   ...props
 }) => {
   const handleRedChange = React.useCallback(
-    (r: Color['r']) => {
+    (r: ColorFormats.RGBA['r']) => {
       onChannelChange({ r });
     },
     [onChannelChange],
   );
   const handleGreenChange = React.useCallback(
-    (g: Color['g']) => {
+    (g: ColorFormats.RGBA['g']) => {
       onChannelChange({ g });
     },
     [onChannelChange],
   );
   const handleBlueChange = React.useCallback(
-    (b: Color['b']) => {
+    (b: ColorFormats.RGBA['b']) => {
       onChannelChange({ b });
     },
     [onChannelChange],
   );
   const handleAlphaChange = React.useCallback(
-    (a: Color['a']) => {
+    (a: ColorFormats.RGBA['a']) => {
       onChannelChange({ a: a / 100 });
     },
     [onChannelChange],
   );
 
+  const rgbColor: ColorFormats.RGBA = color.toRgb();
+
   return (
     <View {...props}>
       <View>
         <ColorSlider
-          value={color.r}
+          value={rgbColor.r}
           onChange={handleRedChange}
           knobColor="lightcoral"
           backgroundColor={[
-            `rgb(${0}, ${color.g}, ${color.b})`,
-            `rgb(${255}, ${color.g}, ${color.b})`,
+            tinycolor({ ...rgbColor, r: 0 }).toRgbString(),
+            tinycolor({ ...rgbColor, r: 255 }).toRgbString(),
           ]}
         />
         <View style={styles.sliderWrapper}>
           <ColorSlider
-            value={color.g}
+            value={rgbColor.g}
             onChange={handleGreenChange}
             knobColor="lightgreen"
             backgroundColor={[
-              `rgb(${color.r}, ${0}, ${color.b})`,
-              `rgb(${color.r}, ${255}, ${color.b})`,
+              tinycolor({ ...rgbColor, g: 0 }).toRgbString(),
+              tinycolor({ ...rgbColor, g: 255 }).toRgbString(),
             ]}
           />
         </View>
         <View style={styles.sliderWrapper}>
           <ColorSlider
-            value={color.b}
+            value={rgbColor.b}
             onChange={handleBlueChange}
             knobColor="lightblue"
             backgroundColor={[
-              `rgb(${color.r}, ${color.g}, ${0})`,
-              `rgb(${color.r}, ${color.g}, ${255})`,
+              tinycolor({ ...rgbColor, b: 0 }).toRgbString(),
+              tinycolor({ ...rgbColor, b: 255 }).toRgbString(),
             ]}
           />
         </View>
         <View style={styles.sliderWrapper}>
           <Slider
             max={100}
-            value={color.a * 100}
+            value={rgbColor.a * 100}
             onChange={handleAlphaChange}
             knobColor="white"
             backgroundColor={[
               'transparent',
-              `rgb(${color.r}, ${color.g}, ${color.b})`,
+              /**
+               * in order to the preserve ordinal alpha spectrum
+               */
+              tinycolor({
+                r: rgbColor.r,
+                g: rgbColor.g,
+                b: rgbColor.b,
+              }).toRgbString(),
             ]}
           />
         </View>

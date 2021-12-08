@@ -1,20 +1,22 @@
 import qs from 'qs';
+import { ColorFormats } from 'tinycolor2';
 import { z } from 'zod';
-import { Channel, Color, Status } from '../models/pixels';
+import { Channel, IPixel, Status } from '../models/pixels';
 import { api } from './env';
 
 const adjustBrightness =
-  (alpha: Color['a']) => (channel: z.infer<typeof Channel>) => {
+  (alpha: ColorFormats.RGBA['a']) => (channel: z.infer<typeof Channel>) => {
     return Math.round((1 - alpha) * 255 + alpha * channel);
   };
 
 export const setPixels = async (
-  colors: Color[],
+  colors: IPixel[],
 ): Promise<ReturnType<typeof Status['safeParse']>> => {
   const response = await fetch(
     api.concat(
       qs.stringify(
-        colors.map(({ r, g, b, a }) => {
+        colors.map(({ color }) => {
+          const { r, g, b, a } = color.toRgb();
           const adjustBrightness$ = adjustBrightness(a);
           return JSON.stringify([
             adjustBrightness$(r),

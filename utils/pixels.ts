@@ -1,3 +1,4 @@
+import tinycolor from 'tinycolor2';
 import { Color, IPixel } from '../models/pixels';
 import { color, pixelsX, pixelsY } from '../services/env';
 
@@ -9,14 +10,14 @@ export const pixelsRange = yRange.flatMap((_, i) =>
 
 const [r, g, b, a] = color;
 
-export const initialColor: Color = {
+export const initialColor: Color = tinycolor({
   r,
   g,
   b,
   a,
-};
+});
 export const initialPixel: IPixel = {
-  ...initialColor,
+  color: initialColor,
   selected: false,
 };
 export const initialPixels: IPixel[] = Array(pixelsRange.length).fill(
