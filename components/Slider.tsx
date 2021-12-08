@@ -1,7 +1,6 @@
 import { LinearGradient, LinearGradientProps } from 'expo-linear-gradient';
 import React from 'react';
 import {
-  LayoutChangeEvent,
   LayoutRectangle,
   PanResponder,
   StyleSheet,
@@ -71,11 +70,15 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
   const isChangingRef = React.useRef(false);
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
+  const trackRef = React.useRef<View | null>(null);
   const layoutRef = React.useRef<LayoutRectangle | null>(null);
-  const handleLayout = ({ nativeEvent }: LayoutChangeEvent) => {
-    layoutRef.current = nativeEvent.layout;
-    const position = (props.value * nativeEvent.layout.width) / props.max;
-    setPosition(position);
+  const handleLayout = () => {
+    trackRef.current?.measureInWindow((x, y, width, height) => {
+      const layout: LayoutRectangle = { x, y, width, height };
+      layoutRef.current = layout;
+      const position = (props.value * layout.width) / props.max;
+      setPosition(position);
+    });
   };
   const [position, setPosition] = React.useState(0);
   const scale = React.useCallback(
@@ -91,10 +94,10 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
     [props.max],
   );
   const limitToLayout = React.useCallback((currentPosition: number) => {
-    return layoutRef.current?.left && layoutRef.current?.width
+    return layoutRef.current?.x && layoutRef.current?.width
       ? Math.min(
-          layoutRef.current?.left + layoutRef.current.width,
-          Math.max(layoutRef.current?.left, currentPosition),
+          layoutRef.current?.x + layoutRef.current.width,
+          Math.max(layoutRef.current?.x, currentPosition),
         )
       : currentPosition;
   }, []);
@@ -127,7 +130,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
       onPanResponderMove: (e, gestureState) => {
         const newCenterPosition = layoutRef.current
           ? limitToLayout(gestureState.x0 + gestureState.dx) -
-            layoutRef.current.left
+            layoutRef.current.x
           : 0;
         const scaled = scale(newCenterPosition);
         setPosition(newCenterPosition);
@@ -137,7 +140,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
         const scaled = layoutRef.current
           ? scale(
               limitToLayout(gestureState.x0 + gestureState.dx) -
-                layoutRef.current.left,
+                layoutRef.current.x,
             )
           : 0;
 
@@ -154,7 +157,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.sliderWrapper} onLayout={handleLayout}>
+      <View ref={trackRef} style={styles.sliderWrapper} onLayout={handleLayout}>
         {Array.isArray(props.backgroundColor) ? (
           <LinearGradient
             colors={props.backgroundColor}
