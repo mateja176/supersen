@@ -3,6 +3,8 @@ import React from 'react';
 import {
   LayoutRectangle,
   PanResponder,
+  Pressable,
+  PressableProps,
   StyleSheet,
   Text,
   View,
@@ -47,7 +49,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const linearGradientEnd = { x: 0.1, y: 0.2 };
+const linearGradientStart: LinearGradientProps['start'] = { x: 0, y: 0 };
+const linearGradientEnd: LinearGradientProps['end'] = { x: 1, y: 1 };
 
 const onStartShouldSetPanResponder = () => true;
 const onStartShouldSetPanResponderCapture = () => true;
@@ -155,12 +158,24 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
     }),
   ).current;
 
+  const handleTrackPress: PressableProps['onPress'] = (e) => {
+    if (layoutRef.current) {
+      props.onChange(scale(e.nativeEvent.pageX - layoutRef.current.x));
+    }
+  };
+
   return (
     <View style={styles.wrapper}>
-      <View ref={trackRef} style={styles.sliderWrapper} onLayout={handleLayout}>
+      <Pressable
+        ref={trackRef}
+        style={styles.sliderWrapper}
+        onLayout={handleLayout}
+        onPress={handleTrackPress}
+      >
         {Array.isArray(props.backgroundColor) ? (
           <LinearGradient
             colors={props.backgroundColor}
+            start={linearGradientStart}
             end={linearGradientEnd}
           >
             <View style={[styles.track, { height }]} />
@@ -201,7 +216,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
           ]}
           accessibilityValue={{ min: 0, max: props.max, now: props.value }}
         />
-      </View>
+      </Pressable>
       <Text style={styles.label}>{scale(position)}</Text>
     </View>
   );
