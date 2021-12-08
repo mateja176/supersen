@@ -193,10 +193,12 @@ const Pixels: React.FC<PixelsProps> = (props) => {
               key={i}
               pixel={pixels[i]}
               isRangeSelectIndex={isRangeSelectIndex}
-              marginRight={'4%'}
-              marginLeft={i % pixelsX === 0 ? '4%' : 0}
-              marginTop={i < pixelsX ? '4%' : 0}
-              marginBottom={'4%'}
+              style={{
+                marginRight: '4%',
+                marginLeft: i % pixelsX === 0 ? '4%' : 0,
+                marginTop: i < pixelsX ? '4%' : 0,
+                marginBottom: '4%',
+              }}
               onPress={() => {
                 if (rangeSelectIndex === null) {
                   handleToggle(i);

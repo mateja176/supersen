@@ -1,5 +1,12 @@
 import React from 'react';
-import { Pressable, PressableProps, StyleSheet, View } from 'react-native';
+import {
+  Pressable,
+  PressableProps,
+  StyleProp,
+  StyleSheet,
+  View,
+} from 'react-native';
+import { ViewStyle } from 'react-native-web';
 import useTheme from '../hooks/theme';
 
 const styles = StyleSheet.create({
@@ -26,6 +33,7 @@ const styles = StyleSheet.create({
 export interface CheckboxProps
   extends Omit<
     PressableProps,
+    | 'style'
     | 'onPress'
     | 'accessible'
     | 'accessibilityLabel'
@@ -33,15 +41,16 @@ export interface CheckboxProps
     | 'accessibilityActions'
   > {
   checked: boolean;
-  onChange?: React.Dispatch<boolean>;
   disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
+  onChange?: React.Dispatch<boolean>;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
   checked,
-  onChange,
   disabled = false,
   style,
+  onChange,
   ...props
 }) => {
   const { theme } = useTheme();
@@ -55,9 +64,9 @@ const Checkbox: React.FC<CheckboxProps> = ({
     <Pressable
       {...props}
       style={[
-        style as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         styles.checkbox,
         { backgroundColor: theme.colors.bg.white },
+        style,
       ]}
       onPress={handleChange}
       accessible

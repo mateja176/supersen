@@ -1,5 +1,11 @@
 import React from 'react';
-import { Pressable, PressableProps, StyleSheet, ViewStyle } from 'react-native';
+import {
+  Pressable,
+  PressableProps,
+  StyleProp,
+  StyleSheet,
+  ViewStyle,
+} from 'react-native';
 import useTheme from '../hooks/theme';
 import { IPixel } from '../models/pixels';
 import CheckBox from './Checkbox';
@@ -21,21 +27,19 @@ const styles = StyleSheet.create({
 
 export interface PixelProps
   extends Omit<
-      PressableProps,
-      | 'accessible'
-      | 'accessibilityLabel'
-      | 'accessibilityHint'
-      | 'accessibilityRole'
-      | 'accessibilityActions'
-    >,
-    Pick<
-      ViewStyle,
-      'marginLeft' | 'marginRight' | 'marginTop' | 'marginBottom'
-    > {
+    PressableProps,
+    | 'style'
+    | 'accessible'
+    | 'accessibilityLabel'
+    | 'accessibilityHint'
+    | 'accessibilityRole'
+    | 'accessibilityActions'
+  > {
   pixel: IPixel;
   isRangeSelectIndex: boolean;
   onPress: () => void;
   onLongPress: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 const Pixel: React.FC<PixelProps> = ({
@@ -43,10 +47,7 @@ const Pixel: React.FC<PixelProps> = ({
   isRangeSelectIndex,
   onPress,
   onLongPress,
-  marginLeft,
-  marginRight,
-  marginTop,
-  marginBottom,
+  style,
   ...props
 }) => {
   const { theme } = useTheme();
@@ -63,15 +64,12 @@ const Pixel: React.FC<PixelProps> = ({
       style={[
         styles.pixel,
         {
-          marginLeft,
-          marginRight,
-          marginTop,
-          marginBottom,
           ...(isRangeSelectIndex ? { borderWidth: 0 } : {}),
           ...outlineStyle,
           borderColor: theme.colors.bg.secondary,
           backgroundColor: `rgba(${pixel.r}, ${pixel.g}, ${pixel.b}, ${pixel.a})`,
         },
+        style,
       ]}
       onPress={onPress}
       onLongPress={onLongPress}

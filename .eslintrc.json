@@ -17,7 +17,8 @@
       "warn",
       { "argsIgnorePattern": "^props$" }
     ],
-    "react/self-closing-comp": "warn"
+    "react/self-closing-comp": "warn",
+    "object-shorthand": "warn"
   },
   "settings": {
     "import/ignore": ["react-native"]

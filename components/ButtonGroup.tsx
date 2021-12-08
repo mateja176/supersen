@@ -18,7 +18,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({
   ...props
 }) => {
   return (
-    <View {...props} style={[style, styles.buttonGroup]}>
+    <View {...props} style={[styles.buttonGroup, style]}>
       {React.Children.map(children, (child) => (
         <View style={styles.children}>{child}</View>
       ))}

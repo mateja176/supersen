@@ -3,9 +3,11 @@ import React from 'react';
 import {
   Pressable,
   PressableProps,
+  StyleProp,
   StyleSheet,
   Text,
   View,
+  ViewStyle,
 } from 'react-native';
 import tinycolor from 'tinycolor2';
 import useTheme from '../hooks/theme';
@@ -26,17 +28,19 @@ const styles = StyleSheet.create({
 export interface IconButtonProps
   extends Omit<
     PressableProps,
-    'children' | 'accessible' | 'accessibilityLabel'
+    'style' | 'children' | 'accessible' | 'accessibilityLabel'
   > {
   iconName: React.ComponentProps<typeof Ionicons>['name'];
   children?: string;
-  color?: string;
+  style?: StyleProp<ViewStyle>;
   backgroundColor?: string;
+  color?: string;
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
   children,
   iconName,
+  style,
   color,
   backgroundColor,
   ...props
@@ -58,6 +62,7 @@ const IconButton: React.FC<IconButtonProps> = ({
             ? tinycolor(backgroundColorOrDefault).darken(10).toString()
             : backgroundColorOrDefault,
         },
+        style,
       ]}
     >
       <View style={styles.wrapper}>

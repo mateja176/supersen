@@ -46,14 +46,18 @@ export interface SwatchesProps extends ScrollViewProps {
   onChange: (color: Color) => void;
 }
 
-const Swatches: React.FC<SwatchesProps> = ({ onChange, ...props }) => {
+const Swatches: React.FC<SwatchesProps> = ({
+  onChange,
+  contentContainerStyle,
+  ...props
+}) => {
   const { theme } = useTheme();
 
   return (
     <ScrollView
       horizontal
       {...props}
-      contentContainerStyle={[props.contentContainerStyle, styles.wrapper]}
+      contentContainerStyle={[styles.wrapper, contentContainerStyle]}
     >
       {swatches.map((swatch) => (
         <Pressable

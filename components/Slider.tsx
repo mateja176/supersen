@@ -5,6 +5,7 @@ import {
   PanResponder,
   Pressable,
   PressableProps,
+  StyleProp,
   StyleSheet,
   Text,
   View,
@@ -61,13 +62,24 @@ const onPanResponderTerminationRequest = () => false;
 export interface SliderProps extends Pick<ViewStyle, 'height'> {
   value: number;
   max: number;
-  onChange: React.Dispatch<number>;
   knobColor: ViewStyle['backgroundColor'];
   backgroundColor: ViewStyle['backgroundColor'] | LinearGradientProps['colors'];
+  onChange: React.Dispatch<number>;
   color?: ViewStyle['backgroundColor'];
+  style?: StyleProp<ViewStyle>;
 }
 
-const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
+const Slider: React.FC<SliderProps> = ({
+  value,
+  max,
+  knobColor,
+  backgroundColor,
+  onChange,
+  color,
+  style,
+  height = 4,
+  ...props
+}) => {
   const { theme } = useTheme();
 
   const isChangingRef = React.useRef(false);
@@ -79,7 +91,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
     trackRef.current?.measureInWindow((x, y, width, height) => {
       const layout: LayoutRectangle = { x, y, width, height };
       layoutRef.current = layout;
-      const position = (props.value * layout.width) / props.max;
+      const position = (value * layout.width) / max;
       setPosition(position);
     });
   };
@@ -90,11 +102,11 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
        * scaled / max = position / width
        */
       const scaled = layoutRef.current
-        ? Math.round((currentPosition * props.max) / layoutRef.current.width)
+        ? Math.round((currentPosition * max) / layoutRef.current.width)
         : 0;
       return scaled;
     },
-    [props.max],
+    [max],
   );
   const limitToLayout = React.useCallback((currentPosition: number) => {
     return layoutRef.current?.x && layoutRef.current?.width
@@ -106,17 +118,17 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
   }, []);
   React.useEffect(() => {
     if (!isChangingRef.current && layoutRef.current) {
-      setPosition((props.value * layoutRef.current.width) / props.max);
+      setPosition((value * layoutRef.current.width) / max);
     }
-  }, [props.max, props.value]);
+  }, [max, value]);
   const handleValueChange = React.useMemo(
     () =>
       throttle({
         timeoutRef,
         delay: 500,
-        callback: props.onChange,
+        callback: onChange,
       }),
-    [props.onChange],
+    [onChange],
   );
 
   const panResponder = React.useRef(
@@ -152,7 +164,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
           timeoutRef.current = null;
         }
         isChangingRef.current = false;
-        props.onChange(scaled);
+        onChange(scaled);
       },
       onPanResponderTerminationRequest,
     }),
@@ -160,39 +172,34 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
 
   const handleTrackPress: PressableProps['onPress'] = (e) => {
     if (layoutRef.current) {
-      props.onChange(scale(e.nativeEvent.pageX - layoutRef.current.x));
+      onChange(scale(e.nativeEvent.pageX - layoutRef.current.x));
     }
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View {...props} style={[styles.wrapper, style]}>
       <Pressable
         ref={trackRef}
         style={styles.sliderWrapper}
         onLayout={handleLayout}
         onPress={handleTrackPress}
       >
-        {Array.isArray(props.backgroundColor) ? (
+        {Array.isArray(backgroundColor) ? (
           <LinearGradient
-            colors={props.backgroundColor}
+            colors={backgroundColor}
             start={linearGradientStart}
             end={linearGradientEnd}
           >
             <View style={[styles.track, { height }]} />
           </LinearGradient>
         ) : (
-          <View
-            style={[
-              styles.track,
-              { height, backgroundColor: props.backgroundColor },
-            ]}
-          />
+          <View style={[styles.track, { height, backgroundColor }]} />
         )}
-        {props.color && (
+        {color && (
           <View
             style={[
               styles.fill,
-              { height, backgroundColor: props.color, width: position },
+              { height, backgroundColor: color, width: position },
             ]}
           />
         )}
@@ -202,7 +209,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
             styles.knob,
             {
               borderColor: theme.colors.bg.secondary,
-              backgroundColor: props.knobColor,
+              backgroundColor: knobColor,
               left: position - halfKnobSize,
             },
           ]}
@@ -214,7 +221,7 @@ const Slider: React.FC<SliderProps> = ({ height = 4, ...props }) => {
             { name: 'increment', label: 'Increment slider value' },
             { name: 'decrement', label: 'Decrements slider value' },
           ]}
-          accessibilityValue={{ min: 0, max: props.max, now: props.value }}
+          accessibilityValue={{ min: 0, max, now: value }}
         />
       </Pressable>
       <Text style={styles.label}>{scale(position)}</Text>
