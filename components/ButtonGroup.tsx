@@ -12,9 +12,13 @@ const styles = StyleSheet.create({
 
 export interface ButtonGroupProps extends ViewProps {}
 
-const ButtonGroup: React.FC<ButtonGroupProps> = ({ children, ...props }) => {
+const ButtonGroup: React.FC<ButtonGroupProps> = ({
+  children,
+  style,
+  ...props
+}) => {
   return (
-    <View style={styles.buttonGroup} {...props}>
+    <View {...props} style={[style, styles.buttonGroup]}>
       {React.Children.map(children, (child) => (
         <View style={styles.children}>{child}</View>
       ))}

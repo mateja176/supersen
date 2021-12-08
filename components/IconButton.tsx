@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import tinycolor from 'tinycolor2';
 import useTheme from '../hooks/theme';
 
 const styles = StyleSheet.create({
@@ -44,6 +45,8 @@ const IconButton: React.FC<IconButtonProps> = ({
 
   const textColor = color ?? theme.colors.text.white;
 
+  const backgroundColorOrDefault = backgroundColor ?? theme.colors.bg.primary;
+
   return (
     <Pressable
       {...props}
@@ -51,8 +54,9 @@ const IconButton: React.FC<IconButtonProps> = ({
       accessibilityLabel={children}
       style={[
         {
-          backgroundColor: backgroundColor ?? theme.colors.bg.primary,
-          opacity: props.disabled ? 0.5 : 1,
+          backgroundColor: props.disabled
+            ? tinycolor(backgroundColorOrDefault).darken(10).toString()
+            : backgroundColorOrDefault,
         },
       ]}
     >

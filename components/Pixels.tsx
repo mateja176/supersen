@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Animated,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
@@ -16,7 +17,6 @@ import * as services from '../services/pixels';
 import { initialColor, pixelsRange } from '../utils/pixels';
 import ButtonGroup from './ButtonGroup';
 import ColorPicker from './ColorPicker/ColorPicker';
-import Grow from './Grow';
 import IconButton from './IconButton';
 import Pixel from './Pixel';
 
@@ -28,21 +28,17 @@ const initialPixelsAndStatus: { deselected: boolean; pixels: IPixel[] } = {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
+    overflow: 'hidden',
   },
   pixels: {
     flexWrap: 'wrap',
     flexDirection: 'row',
   },
-  grow: {
-    width: '100%',
-    position: 'absolute', // eslint-disable-line @typescript-eslint/no-explicit-any
-    bottom: 0,
-    alignItems: 'center',
-    paddingLeft: `${pixelsX}%`,
-    paddingRight: `${pixelsX}%`,
-  },
   colorPickerWrapper: {
+    position: 'absolute',
     width: '100%',
+    paddingLeft: '4%',
+    paddingRight: '4%',
     paddingTop: 10,
     paddingBottom: 10,
   },
@@ -81,9 +77,34 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const buttonGroupLayout = useLayout();
   const colorPickerWrapperLayout = useLayout();
+  const colorPickerWrapperTranslateY = React.useRef(
+    new Animated.Value(0),
+  ).current;
   const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
+  const setColorPickerVisibleAndAnimate = React.useCallback(
+    (action: React.SetStateAction<boolean>) => {
+      setColorPickerVisible((visible) => {
+        const newVisible =
+          typeof action === 'function' ? action(visible) : action;
+
+        if (colorPickerWrapperLayout.layoutRef.current) {
+          const toValue = newVisible
+            ? -colorPickerWrapperLayout.layoutRef.current.height
+            : 0;
+          Animated.timing(colorPickerWrapperTranslateY, {
+            toValue,
+            duration: 300,
+            useNativeDriver: false,
+          }).start();
+        }
+
+        return newVisible;
+      });
+    },
+    [colorPickerWrapperLayout, colorPickerWrapperTranslateY],
+  );
   const toggleColorPicker = () => {
-    setColorPickerVisible((visible) => {
+    setColorPickerVisibleAndAnimate((visible) => {
       return !visible;
     });
   };
@@ -124,13 +145,13 @@ const Pixels: React.FC<PixelsProps> = (props) => {
         );
 
         if (pixelsAndStatus.deselected) {
-          setColorPickerVisible(false);
+          setColorPickerVisibleAndAnimate(false);
         }
 
         return pixelsAndStatus.pixels;
       });
     },
-    [setPixels],
+    [setColorPickerVisibleAndAnimate, setPixels],
   );
 
   const { allSelected, noneSelected } = React.useMemo(() => {
@@ -147,11 +168,11 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const selectAll = () => {
     setSelected(true);
-    setColorPickerVisible(true);
+    setColorPickerVisibleAndAnimate(true);
   };
   const deselectAll = () => {
     setSelected(false);
-    setColorPickerVisible(false);
+    setColorPickerVisibleAndAnimate(false);
   };
 
   return (
@@ -172,10 +193,10 @@ const Pixels: React.FC<PixelsProps> = (props) => {
               key={i}
               pixel={pixels[i]}
               isRangeSelectIndex={isRangeSelectIndex}
-              marginRight={`${pixelsX}%`}
-              marginLeft={i % pixelsX === 0 ? `${pixelsX}%` : 0}
-              marginTop={i < pixelsX ? `${pixelsX}%` : 0}
-              marginBottom={`${pixelsX}%`}
+              marginRight={'4%'}
+              marginLeft={i % pixelsX === 0 ? '4%' : 0}
+              marginTop={i < pixelsX ? '4%' : 0}
+              marginBottom={'4%'}
               onPress={() => {
                 if (rangeSelectIndex === null) {
                   handleToggle(i);
@@ -199,33 +220,32 @@ const Pixels: React.FC<PixelsProps> = (props) => {
         })}
       </ScrollView>
 
-      <Grow
+      <Animated.View
         style={[
-          styles.grow,
+          styles.colorPickerWrapper,
           {
+            bottom:
+              buttonGroupLayout.layoutRef.current &&
+              colorPickerWrapperLayout.layoutRef.current
+                ? buttonGroupLayout.layoutRef.current.height -
+                  colorPickerWrapperLayout.layoutRef.current.height
+                : -dimensions.height,
+            transform: [
+              {
+                translateY: colorPickerWrapperTranslateY,
+              },
+            ],
             backgroundColor: theme.colors.bg.white,
-            bottom: buttonGroupLayout.layoutRef.current?.height ?? 0,
           },
         ]}
-        layoutRef={colorPickerWrapperLayout.layoutRef}
-        visible={colorPickerVisible}
+        onLayout={colorPickerWrapperLayout.onLayout}
       >
-        <View
-          style={[
-            styles.colorPickerWrapper,
-            {
-              backgroundColor: theme.colors.bg.white,
-            },
-          ]}
-          onLayout={colorPickerWrapperLayout.onLayout}
-        >
-          <ColorPicker
-            color={currentColor ?? initialColor}
-            onChange={setColor}
-            onChannelChange={setChannel}
-          />
-        </View>
-      </Grow>
+        <ColorPicker
+          color={currentColor ?? initialColor}
+          onChange={setColor}
+          onChannelChange={setChannel}
+        />
+      </Animated.View>
 
       <ButtonGroup onLayout={buttonGroupLayout.onLayout}>
         <IconButton
