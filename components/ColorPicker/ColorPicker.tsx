@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
-import tinycolor, { ColorFormats } from 'tinycolor2';
-import { Color, WithChannel } from '../../models/pixels';
 import Slider from '../Slider';
+import tinycolor from 'tinycolor2';
+import { ColorFormats } from 'tinycolor2';
+import { Color, WithChannel } from '../../models/pixels';
 import ColorSlider from './ColorSlider';
 import Swatches from './Swatches';
 
@@ -59,7 +60,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
       <View>
         <ColorSlider
           value={rgbColor.r}
-          onChange={handleRedChange}
+          onValueChange={handleRedChange}
           knobColor="lightcoral"
           backgroundColor={[
             tinycolor({ ...rgbColor, r: 0 }).toRgbString(),
@@ -69,7 +70,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
         <View style={styles.sliderWrapper}>
           <ColorSlider
             value={rgbColor.g}
-            onChange={handleGreenChange}
+            onValueChange={handleGreenChange}
             knobColor="lightgreen"
             backgroundColor={[
               tinycolor({ ...rgbColor, g: 0 }).toRgbString(),
@@ -80,7 +81,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
         <View style={styles.sliderWrapper}>
           <ColorSlider
             value={rgbColor.b}
-            onChange={handleBlueChange}
+            onValueChange={handleBlueChange}
             knobColor="lightblue"
             backgroundColor={[
               tinycolor({ ...rgbColor, b: 0 }).toRgbString(),
@@ -92,7 +93,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
           <Slider
             max={100}
             value={rgbColor.a * 100}
-            onChange={handleAlphaChange}
+            onValueChange={handleAlphaChange}
             knobColor="white"
             backgroundColor={[
               'transparent',

@@ -64,7 +64,7 @@ export interface SliderProps extends Pick<ViewStyle, 'height'> {
   max: number;
   knobColor: ViewStyle['backgroundColor'];
   backgroundColor: ViewStyle['backgroundColor'] | LinearGradientProps['colors'];
-  onChange: React.Dispatch<number>;
+  onValueChange: React.Dispatch<number>;
   color?: ViewStyle['backgroundColor'];
   style?: StyleProp<ViewStyle>;
 }
@@ -74,7 +74,7 @@ const Slider: React.FC<SliderProps> = ({
   max,
   knobColor,
   backgroundColor,
-  onChange,
+  onValueChange,
   color,
   style,
   height = 4,
@@ -126,9 +126,9 @@ const Slider: React.FC<SliderProps> = ({
       throttle({
         timeoutRef,
         delay: 500,
-        callback: onChange,
+        callback: onValueChange,
       }),
-    [onChange],
+    [onValueChange],
   );
 
   const panResponder = React.useRef(
@@ -164,7 +164,7 @@ const Slider: React.FC<SliderProps> = ({
           timeoutRef.current = null;
         }
         isChangingRef.current = false;
-        onChange(scaled);
+        onValueChange(scaled);
       },
       onPanResponderTerminationRequest,
     }),
@@ -172,7 +172,7 @@ const Slider: React.FC<SliderProps> = ({
 
   const handleTrackPress: PressableProps['onPress'] = (e) => {
     if (layoutRef.current) {
-      onChange(scale(e.nativeEvent.pageX - layoutRef.current.x));
+      onValueChange(scale(e.nativeEvent.pageX - layoutRef.current.x));
     }
   };
 
