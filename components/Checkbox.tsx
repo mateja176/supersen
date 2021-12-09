@@ -5,8 +5,8 @@ import {
   StyleProp,
   StyleSheet,
   View,
+  ViewStyle,
 } from 'react-native';
-import { ViewStyle } from 'react-native-web';
 import useTheme from '../hooks/theme';
 
 const styles = StyleSheet.create({

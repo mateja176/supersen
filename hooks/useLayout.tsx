@@ -3,7 +3,7 @@ import { LayoutChangeEvent, LayoutRectangle } from 'react-native';
 
 const useLayout = (): {
   layoutRef: React.MutableRefObject<LayoutRectangle | null>;
-  onLayout: (layoutChangeEvent: LayoutChangeEvent) => void;
+  onLayout: React.Dispatch<LayoutChangeEvent>;
 } => {
   const layoutRef = React.useRef<LayoutRectangle | null>(null);
   const onLayout = ({ nativeEvent }: LayoutChangeEvent) => {

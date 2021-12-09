@@ -1,16 +1,27 @@
 import React from 'react';
-import tinycolor from 'tinycolor2';
-import { Color, IPixel, WithChannel } from '../models/pixels';
+import tinycolor, { ColorFormats } from 'tinycolor2';
+import {
+  Color,
+  ColorWithOriginalInput,
+  IPixel,
+  WithChannel,
+} from '../models/pixels';
 import { initialPixels } from '../utils/pixels';
 
 export interface PixelsStore {
   pixels: IPixel[];
   currentColor: Color | null;
   selectRange: (startIndex: number, stopIndex: number) => void;
-  setSelected: (selected: boolean) => void;
+  setSelected: React.Dispatch<boolean>;
   setPixels: React.Dispatch<React.SetStateAction<IPixel[]>>;
-  setColor: (color: Color) => void;
-  setChannel: (withChannel: WithChannel) => void;
+  setColor: React.Dispatch<Color>;
+  setChannel: React.Dispatch<WithChannel>;
+  /** 0-360 */
+  setHue: React.Dispatch<ColorFormats.HSV['h']>;
+  /** percentages */
+  setSaturationAndLightnessChange: React.Dispatch<
+    [ColorFormats.HSV['s'], ColorFormats.HSV['v']]
+  >;
 }
 const usePixels = (): PixelsStore => {
   const [pixels, setPixels] = React.useState(initialPixels);
@@ -70,6 +81,32 @@ const usePixels = (): PixelsStore => {
     [],
   );
 
+  const setHue: PixelsStore['setHue'] = React.useCallback((h) => {
+    return setPixels((pixels) => {
+      return pixels.map((pixel) => {
+        const hsvColor = pixel.color.toHsv();
+        const color = tinycolor({ ...hsvColor, h });
+        return pixel.selected ? { ...pixel, color } : pixel;
+      });
+    });
+  }, []);
+  const setSaturationAndLightnessChange: PixelsStore['setSaturationAndLightnessChange'] =
+    React.useCallback(([s, v]) => {
+      return setPixels((pixels) => {
+        return pixels.map((pixel) => {
+          const hsvColor = pixel.color.toHsv();
+          const color = tinycolor({
+            h:
+              (pixel.color as ColorWithOriginalInput)._originalInput.h ??
+              hsvColor.h,
+            s,
+            v,
+          });
+          return pixel.selected ? { ...pixel, color } : pixel;
+        });
+      });
+    }, []);
+
   return {
     pixels,
     currentColor,
@@ -78,6 +115,8 @@ const usePixels = (): PixelsStore => {
     setPixels,
     setColor,
     setChannel,
+    setHue,
+    setSaturationAndLightnessChange,
   };
 };
 

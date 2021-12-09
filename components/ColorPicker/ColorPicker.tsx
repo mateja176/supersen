@@ -1,109 +1,152 @@
+import { LinearGradient, LinearGradientProps } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
+import Svg, {
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Rect,
+  Stop,
+} from 'react-native-svg';
 import tinycolor, { ColorFormats } from 'tinycolor2';
-import { Color, WithChannel } from '../../models/pixels';
-import Slider from '../Slider';
-import ColorSlider from './ColorSlider';
+import { NumberPair, WithLayout } from '../../hooks/usePan/models';
+import usePan1D from '../../hooks/usePan/usePan1D';
+import usePan2D from '../../hooks/usePan/usePan2D';
+import { Color, ColorWithOriginalInput } from '../../models/pixels';
+import Slider from '../Slider/Slider';
 import Swatches from './Swatches';
 
+const saturationAndLightnessHeight = 200;
+
+const maxHue = 359;
+const maxSaturationAndLightness: NumberPair = [100, 100];
+
+const hueGradientStart: LinearGradientProps['start'] = { x: 0, y: 0 };
+const hueGradientEnd: LinearGradientProps['end'] = { x: 1, y: 1 };
+
+const hueColors = [
+  '#ff0000',
+  '#ffff00',
+  '#00ff00',
+  '#00ffff',
+  '#0000ff',
+  '#ff00ff',
+  '#ff0000',
+];
+
 const styles = StyleSheet.create({
-  sliderLayout: {
-    marginTop: 10,
+  hueSlider: {
+    marginTop: 20,
+  },
+  hueSliderBackground: {
+    width: '100%',
+    height: '100%',
   },
   swatchesLayout: {
-    marginTop: 10,
+    marginTop: 20,
   },
 });
 
-export interface ColorPickerProps extends ViewProps {
+export interface ColorPickerProps extends ViewProps, WithLayout {
   color: Color;
-  onChange: (color: Color) => void;
-  onChannelChange: (color: WithChannel) => void;
+  onChange: React.Dispatch<Color>;
+  onHueChange: (hue: ColorFormats.HSV['h']) => void;
+  onSaturationAndLightnessChange: (
+    saturationAndLightness: [ColorFormats.HSV['s'], ColorFormats.HSV['v']],
+  ) => void;
 }
 
 const ColorPicker: React.FC<ColorPickerProps> = ({
   color,
+  layout,
   onChange,
-  onChannelChange,
+  onHueChange,
+  onSaturationAndLightnessChange,
   ...props
 }) => {
-  const handleRedChange = React.useCallback(
-    (r: ColorFormats.RGBA['r']) => {
-      onChannelChange({ r });
-    },
-    [onChannelChange],
-  );
-  const handleGreenChange = React.useCallback(
-    (g: ColorFormats.RGBA['g']) => {
-      onChannelChange({ g });
-    },
-    [onChannelChange],
-  );
-  const handleBlueChange = React.useCallback(
-    (b: ColorFormats.RGBA['b']) => {
-      onChannelChange({ b });
-    },
-    [onChannelChange],
-  );
-  const handleAlphaChange = React.useCallback(
-    (a: ColorFormats.RGBA['a']) => {
-      onChannelChange({ a: a / 100 });
-    },
-    [onChannelChange],
-  );
+  const hsvColor = React.useMemo(() => {
+    return color.toHsv();
+  }, [color]);
+  /**
+   * when either saturation or value are 0
+   * the hue gets mapped to 0
+   */
+  const originalHue = React.useMemo(() => {
+    return (color as ColorWithOriginalInput)._originalInput.h ?? hsvColor.h;
+  }, [color, hsvColor.h]);
 
-  const rgbColor: ColorFormats.RGBA = color.toRgb();
+  const saturationAndLightness: NumberPair = React.useMemo(
+    () => [hsvColor.s * 100, 100 - hsvColor.v * 100],
+    [hsvColor.s, hsvColor.v],
+  );
+  const handleSaturationAndLightnessChange: typeof onSaturationAndLightnessChange =
+    React.useCallback(
+      ([s, v]) => {
+        // * use decimal format in order to support 1% otherwise it will be mapped to 1 or 100%
+        onSaturationAndLightnessChange([s / 100, (100 - v) / 100]);
+      },
+      [onSaturationAndLightnessChange],
+    );
+  const saturationAndLightnessStore = usePan2D({
+    value: saturationAndLightness,
+    max: maxSaturationAndLightness,
+    layout: React.useMemo(
+      () => layout && { ...layout, height: saturationAndLightnessHeight },
+      [layout],
+    ),
+    onChange: handleSaturationAndLightnessChange,
+  });
+
+  const hueStore = usePan1D({
+    value: originalHue,
+    max: maxHue,
+    onChange: onHueChange,
+  });
+
+  const hueColor = tinycolor({
+    h: hueStore.scaledPosition,
+    s: 100,
+    v: 100,
+  }).toRgbString();
 
   return (
     <View {...props}>
       <View>
-        <ColorSlider
-          value={rgbColor.r}
-          onValueChange={handleRedChange}
-          knobColor="lightcoral"
-          backgroundColor={[
-            tinycolor({ ...rgbColor, r: 0 }).toRgbString(),
-            tinycolor({ ...rgbColor, r: 255 }).toRgbString(),
-          ]}
-        />
-        <ColorSlider
-          value={rgbColor.g}
-          onValueChange={handleGreenChange}
-          style={styles.sliderLayout}
-          knobColor="lightgreen"
-          backgroundColor={[
-            tinycolor({ ...rgbColor, g: 0 }).toRgbString(),
-            tinycolor({ ...rgbColor, g: 255 }).toRgbString(),
-          ]}
-        />
-        <ColorSlider
-          value={rgbColor.b}
-          onValueChange={handleBlueChange}
-          style={styles.sliderLayout}
-          knobColor="lightblue"
-          backgroundColor={[
-            tinycolor({ ...rgbColor, b: 0 }).toRgbString(),
-            tinycolor({ ...rgbColor, b: 255 }).toRgbString(),
-          ]}
-        />
         <Slider
-          max={100}
-          value={rgbColor.a * 100}
-          onValueChange={handleAlphaChange}
-          style={styles.sliderLayout}
-          knobColor="white"
-          backgroundColor={[
-            'transparent',
-            /**
-             * in order to the preserve ordinal alpha spectrum
-             */
-            tinycolor({
-              r: rgbColor.r,
-              g: rgbColor.g,
-              b: rgbColor.b,
-            }).toRgbString(),
-          ]}
-        />
+          {...saturationAndLightnessStore}
+          value={saturationAndLightness}
+          max={maxSaturationAndLightness}
+          height={saturationAndLightnessHeight}
+          backgroundColor={hueColor}
+        >
+          <Svg width="100%" height="100%">
+            <Defs>
+              <SvgLinearGradient id="g3">
+                <Stop stopColor="#fff" />
+                <Stop offset="1" stopColor="#fff" stopOpacity="0" />
+              </SvgLinearGradient>
+              <SvgLinearGradient id="g4" x1=".5" y1="1" x2=".5">
+                <Stop stopColor="#000" />
+                <Stop offset="1" stopColor="#000" stopOpacity="0" />
+              </SvgLinearGradient>
+            </Defs>
+            <Rect width="100%" height="100%" fill="url(#g3)" />
+            <Rect width="100%" height="100%" fill="url(#g4)" />
+          </Svg>
+        </Slider>
+        <Slider
+          {...hueStore}
+          wrapperStyle={styles.hueSlider}
+          value={originalHue}
+          max={maxHue}
+          height={4}
+        >
+          <LinearGradient
+            style={styles.hueSliderBackground}
+            colors={hueColors}
+            start={hueGradientStart}
+            end={hueGradientEnd}
+          />
+        </Slider>
       </View>
 
       <Swatches onChange={onChange} style={styles.swatchesLayout} />

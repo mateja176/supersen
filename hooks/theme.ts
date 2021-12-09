@@ -1,9 +1,10 @@
+import React from 'react';
 import create from 'zustand';
 import theme, { Theme } from '../utils/theme';
 
 export interface ThemeStore {
   theme: Theme;
-  setTheme: (partialTheme: Partial<Theme>) => void;
+  setTheme: React.Dispatch<Partial<Theme>>;
 }
 const useTheme = create<ThemeStore>((set) => ({
   theme,

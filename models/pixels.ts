@@ -22,3 +22,7 @@ export type WithChannel =
   | Pick<ColorFormats.RGBA, 'g'>
   | Pick<ColorFormats.RGBA, 'b'>
   | Pick<ColorFormats.RGBA, 'a'>;
+
+export interface ColorWithOriginalInput extends tinycolor.Instance {
+  _originalInput: Partial<ColorFormats.HSV>;
+}

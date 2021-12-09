@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Slider, { SliderProps } from '../Slider';
+import { UsePan1DProps } from '../../hooks/usePan/models';
+import usePan1D from '../../hooks/usePan/usePan1D';
+import Slider, { SliderProps } from '../Slider/Slider';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -8,12 +10,22 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface ColorSliderProps extends Omit<SliderProps, 'max'> {}
+const max = 255;
 
-const ColorSlider: React.FC<ColorSliderProps> = ({ ...props }) => {
+export interface ColorSliderProps
+  extends Pick<UsePan1DProps, 'onChange'>,
+    Omit<SliderProps<number>, 'max'> {}
+
+const ColorSlider: React.FC<ColorSliderProps> = ({ onChange, ...props }) => {
+  const panStore = usePan1D({
+    value: props.value,
+    max,
+    onChange,
+  });
+
   return (
     <View style={styles.wrapper}>
-      <Slider {...props} max={255} />
+      <Slider {...props} {...panStore} max={max} height={4} />
     </View>
   );
 };

@@ -10,7 +10,6 @@ import Toast from 'react-native-root-toast';
 import { isError, useMutation } from 'react-query';
 import usePixels from '../hooks/pixels';
 import useTheme from '../hooks/theme';
-import useLayout from '../hooks/useLayout';
 import { IPixel } from '../models/pixels';
 import { pixelsX } from '../services/env';
 import * as services from '../services/pixels';
@@ -25,6 +24,11 @@ const initialPixelsAndStatus: { deselected: boolean; pixels: IPixel[] } = {
   pixels: [],
 };
 
+const buttonGroupHeight = 32;
+const colorPickerWrapperHeight = 284;
+
+const colorPickerContentHorizontalPaddingPct = 4;
+const colorPickerContentVerticalPadding = 10;
 const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
@@ -37,10 +41,11 @@ const styles = StyleSheet.create({
   colorPickerWrapper: {
     position: 'absolute',
     width: '100%',
-    paddingLeft: '4%',
-    paddingRight: '4%',
-    paddingTop: 10,
-    paddingBottom: 10,
+    height: colorPickerWrapperHeight,
+    paddingLeft: `${colorPickerContentHorizontalPaddingPct}%`,
+    paddingRight: `${colorPickerContentHorizontalPaddingPct}%`,
+    paddingTop: colorPickerContentVerticalPadding,
+    paddingBottom: colorPickerContentVerticalPadding,
   },
 });
 
@@ -75,8 +80,21 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     setPixelsMutation.mutateAsync(pixels).catch(handleError);
   };
 
-  const buttonGroupLayout = useLayout();
-  const colorPickerWrapperLayout = useLayout();
+  const colorPickerContentLayout = React.useMemo(() => {
+    const colorPickerContentHorizontalPadding =
+      (dimensions.width * colorPickerContentHorizontalPaddingPct) / 100;
+
+    return {
+      x: colorPickerContentHorizontalPadding,
+      y:
+        dimensions.height -
+        buttonGroupHeight -
+        colorPickerWrapperHeight +
+        colorPickerContentVerticalPadding,
+      width: dimensions.width - 2 * colorPickerContentHorizontalPadding,
+      height: colorPickerWrapperHeight,
+    };
+  }, [dimensions.height, dimensions.width]);
   const colorPickerWrapperTranslateY = React.useRef(
     new Animated.Value(0),
   ).current;
@@ -87,21 +105,17 @@ const Pixels: React.FC<PixelsProps> = (props) => {
         const newVisible =
           typeof action === 'function' ? action(visible) : action;
 
-        if (colorPickerWrapperLayout.layoutRef.current) {
-          const toValue = newVisible
-            ? -colorPickerWrapperLayout.layoutRef.current.height
-            : 0;
-          Animated.timing(colorPickerWrapperTranslateY, {
-            toValue,
-            duration: 300,
-            useNativeDriver: false,
-          }).start();
-        }
+        const toValue = newVisible ? -colorPickerWrapperHeight : 0;
+        Animated.timing(colorPickerWrapperTranslateY, {
+          toValue,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
 
         return newVisible;
       });
     },
-    [colorPickerWrapperLayout, colorPickerWrapperTranslateY],
+    [colorPickerWrapperTranslateY],
   );
   const toggleColorPicker = () => {
     setColorPickerVisibleAndAnimate((visible) => {
@@ -119,7 +133,8 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     selectRange,
     setSelected,
     setColor,
-    setChannel,
+    setHue,
+    setSaturationAndLightnessChange,
   } = usePixels();
   const handleToggle = React.useCallback(
     (i: number) => {
@@ -197,7 +212,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
                 marginRight: '4%',
                 marginLeft: i % pixelsX === 0 ? '4%' : 0,
                 marginTop: '4%',
-                marginBottom: i > pixelsRange.length - 5 ? '50%' : 0,
+                marginBottom: i > pixelsRange.length - 5 ? 300 : 0,
               }}
               onPress={() => {
                 if (rangeSelectIndex === null) {
@@ -226,12 +241,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
         style={[
           styles.colorPickerWrapper,
           {
-            bottom:
-              buttonGroupLayout.layoutRef.current &&
-              colorPickerWrapperLayout.layoutRef.current
-                ? buttonGroupLayout.layoutRef.current.height -
-                  colorPickerWrapperLayout.layoutRef.current.height
-                : -dimensions.height,
+            bottom: buttonGroupHeight - colorPickerWrapperHeight,
             transform: [
               {
                 translateY: colorPickerWrapperTranslateY,
@@ -240,16 +250,17 @@ const Pixels: React.FC<PixelsProps> = (props) => {
             backgroundColor: theme.colors.bg.white,
           },
         ]}
-        onLayout={colorPickerWrapperLayout.onLayout}
       >
         <ColorPicker
           color={currentColor ?? initialColor}
+          layout={colorPickerContentLayout}
           onChange={setColor}
-          onChannelChange={setChannel}
+          onHueChange={setHue}
+          onSaturationAndLightnessChange={setSaturationAndLightnessChange}
         />
       </Animated.View>
 
-      <ButtonGroup onLayout={buttonGroupLayout.onLayout}>
+      <ButtonGroup>
         <IconButton
           onPress={deselectAll}
           disabled={noneSelected}

@@ -24,7 +24,6 @@ const swatches = [
   'lightslategrey',
   'lightsteelblue',
   'lightyellow',
-  'black',
   'white',
 ];
 
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
 });
 
 export interface SwatchesProps extends ScrollViewProps {
-  onChange: (color: Color) => void;
+  onChange: React.Dispatch<Color>;
 }
 
 const Swatches: React.FC<SwatchesProps> = ({
