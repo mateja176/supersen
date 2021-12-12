@@ -13,4 +13,6 @@ declare module '@env' {
   export const API: string | undefined;
   export const PIXELS_Y: string | undefined;
   export const PIXELS_X: string | undefined;
+  export const BOARDS: string | undefined;
+  export const SHOULD_ALTERNATE: string | undefined;
 }

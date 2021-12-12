@@ -1,8 +1,6 @@
 import tinycolor, { ColorFormats } from 'tinycolor2';
 import { z } from 'zod';
 
-export const Int = z.number().int().min(1);
-
 export const ColorTuple = z.tuple([
   z.number().int().min(0).max(360),
   z.number().min(0).max(1),

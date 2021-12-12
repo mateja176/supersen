@@ -13,7 +13,7 @@ import useTheme from '../hooks/theme';
 import { IPixel } from '../models/pixels';
 import { pixelsX } from '../services/env';
 import * as services from '../services/pixels';
-import { initialColor, pixelsRange } from '../utils/pixels';
+import { initialColor } from '../utils/pixels';
 import ButtonGroup from './ButtonGroup';
 import ColorPicker from './ColorPicker/ColorPicker';
 import IconButton from './IconButton';
@@ -200,19 +200,19 @@ const Pixels: React.FC<PixelsProps> = (props) => {
       ]}
     >
       <ScrollView contentContainerStyle={styles.pixels} scrollEnabled>
-        {pixelsRange.map((i) => {
+        {pixels.map((pixel, i) => {
           const isRangeSelectIndex = i === rangeSelectIndex;
 
           return (
             <Pixel
               key={i}
-              pixel={pixels[i]}
+              pixel={pixel}
               isRangeSelectIndex={isRangeSelectIndex}
               style={{
                 marginRight: '4%',
                 marginLeft: i % pixelsX === 0 ? '4%' : 0,
                 marginTop: '4%',
-                marginBottom: i > pixelsRange.length - 5 ? 300 : 0,
+                marginBottom: i > pixels.length - 5 ? 300 : 0,
               }}
               onPress={() => {
                 if (rangeSelectIndex === null) {

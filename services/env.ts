@@ -1,6 +1,13 @@
-import { API, INITIAL_HSV, PIXELS_X, PIXELS_Y } from '@env';
+import {
+  API,
+  BOARDS,
+  INITIAL_HSV,
+  PIXELS_X,
+  PIXELS_Y,
+  SHOULD_ALTERNATE,
+} from '@env';
 import { Api } from '../models/env';
-import { ColorTuple, Int } from '../models/pixels';
+import { ColorTuple } from '../models/pixels';
 
 if (!API) {
   throw new Error('API is required');
@@ -14,19 +21,32 @@ export const api = maybeApi.data;
 if (!PIXELS_X) {
   throw new Error('PIXELS_X is required');
 }
-const maybePixelsX = Int.safeParse(parseInt(PIXELS_X));
-if (!maybePixelsX.success) {
+const maybePixelsX = parseInt(PIXELS_X);
+if (Number.isNaN(maybePixelsX)) {
   throw new Error('PIXELS_X must be an integer greater than 0');
 }
-export const pixelsX = maybePixelsX.data;
+export const pixelsX = maybePixelsX;
 if (!PIXELS_Y) {
   throw new Error('PIXELS_Y is required');
 }
-const maybePixelsY = Int.safeParse(parseInt(PIXELS_Y));
-if (!maybePixelsY.success) {
+const maybePixelsY = parseInt(PIXELS_Y);
+if (Number.isNaN(maybePixelsY)) {
   throw new Error('PIXELS_Y must be an integer greater than 0');
 }
-export const pixelsY = maybePixelsY.data;
+export const pixelsY = maybePixelsY;
+export const boards = (() => {
+  if (BOARDS) {
+    const maybeBoards = parseInt(BOARDS);
+    if (Number.isNaN(maybeBoards)) {
+      throw new Error('BOARDS must be an integer');
+    } else {
+      return maybeBoards;
+    }
+  } else {
+    return 1;
+  }
+})();
+export const shouldAlternate = !!SHOULD_ALTERNATE;
 
 if (!INITIAL_HSV) {
   throw new Error('INITIAL_HSV is required');
