@@ -18,6 +18,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
+    borderWidth: 1,
+    borderStyle: 'solid',
   },
   checkmark: {
     width: '80%',
@@ -65,9 +67,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
       {...props}
       style={[
         styles.checkbox,
-        { backgroundColor: theme.colors.bg.white },
+        {
+          backgroundColor: theme.colors.bg.white,
+          borderColor: theme.colors.bg.secondary,
+        },
         style,
       ]}
+      disabled={!onChange}
       onPress={handleChange}
       accessible
       accessibilityLabel="Checkbox"
