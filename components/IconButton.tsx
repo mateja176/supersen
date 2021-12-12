@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import {
   Pressable,
@@ -9,7 +9,6 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import tinycolor from 'tinycolor2';
 import useTheme from '../hooks/theme';
 
 const styles = StyleSheet.create({
@@ -30,7 +29,13 @@ export interface IconButtonProps
     PressableProps,
     'style' | 'children' | 'accessible' | 'accessibilityLabel'
   > {
-  iconName: React.ComponentProps<typeof Ionicons>['name'];
+  iconName:
+    | {
+        ion: React.ComponentProps<typeof Ionicons>['name'];
+      }
+    | {
+        material: React.ComponentProps<typeof MaterialIcons>['name'];
+      };
   children?: string;
   style?: StyleProp<ViewStyle>;
   backgroundColor?: string;
@@ -59,14 +64,18 @@ const IconButton: React.FC<IconButtonProps> = ({
       style={[
         {
           backgroundColor: props.disabled
-            ? tinycolor(backgroundColorOrDefault).darken(10).toString()
+            ? theme.colors.bg.secondary
             : backgroundColorOrDefault,
         },
         style,
       ]}
     >
       <View style={styles.wrapper}>
-        <Ionicons name={iconName} color={textColor} />
+        {'ion' in iconName ? (
+          <Ionicons name={iconName.ion} color={textColor} />
+        ) : (
+          <MaterialIcons name={iconName.material} />
+        )}
         {children && (
           <Text
             style={[

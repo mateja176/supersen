@@ -19,10 +19,7 @@ import ColorPicker from './ColorPicker/ColorPicker';
 import IconButton from './IconButton';
 import Pixel from './Pixel';
 
-const initialPixelsAndStatus: { deselected: boolean; pixels: IPixel[] } = {
-  deselected: true,
-  pixels: [],
-};
+const initialPixels: IPixel[] = [];
 
 const buttonGroupHeight = 32;
 const colorPickerWrapperHeight = 284;
@@ -98,7 +95,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   const colorPickerWrapperTranslateY = React.useRef(
     new Animated.Value(0),
   ).current;
-  const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
+  const [, setColorPickerVisible] = React.useState(false);
   const setColorPickerVisibleAndAnimate = React.useCallback(
     (action: React.SetStateAction<boolean>) => {
       setColorPickerVisible((visible) => {
@@ -132,54 +129,38 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     setPixels,
     selectRange,
     setSelected,
+    invertSelection,
     setColor,
     setHue,
     setSaturationAndLightnessChange,
   } = usePixels();
-  const handleToggle = React.useCallback(
-    (i: number) => {
-      return setPixels((pixels) => {
-        const pixelsAndStatus = pixels.reduce(
-          (pixelsAndStatus1, pixel, index) => {
-            const togglePixel = i === index;
-            return {
-              pixels: pixelsAndStatus1.pixels.concat(
-                togglePixel
-                  ? {
-                      ...pixel,
-                      selected: !pixel.selected,
-                    }
-                  : pixel,
-              ),
-              deselected:
-                pixelsAndStatus1.deselected &&
-                (togglePixel ? pixel.selected : !pixel.selected),
-            };
-          },
-          initialPixelsAndStatus,
-        );
-
-        if (pixelsAndStatus.deselected) {
-          setColorPickerVisibleAndAnimate(false);
-        }
-
-        return pixelsAndStatus.pixels;
-      });
-    },
-    [setColorPickerVisibleAndAnimate, setPixels],
-  );
-
-  const { allSelected, noneSelected } = React.useMemo(() => {
-    const selectedCount = pixels.reduce(
+  const selectedCount = React.useMemo(() => {
+    return pixels.reduce(
       (selectedCount1, pixel) =>
         pixel.selected ? selectedCount1 + 1 : selectedCount1,
       0,
     );
-    return {
-      allSelected: selectedCount === pixels.length,
-      noneSelected: selectedCount === 0,
-    };
   }, [pixels]);
+  const handleToggle = React.useCallback(
+    (i: number) => {
+      return setPixels((pixels) => {
+        return pixels.map((pixel, i1) => {
+          if (i === i1) {
+            if (selectedCount < 2) {
+              setColorPickerVisibleAndAnimate(!pixel.selected);
+            }
+            return {
+              ...pixel,
+              selected: !pixel.selected,
+            };
+          } else {
+            return pixel;
+          }
+        }, initialPixels);
+      });
+    },
+    [selectedCount, setColorPickerVisibleAndAnimate, setPixels],
+  );
 
   const selectAll = () => {
     setSelected(true);
@@ -188,6 +169,12 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   const deselectAll = () => {
     setSelected(false);
     setColorPickerVisibleAndAnimate(false);
+  };
+  const handleInvert = () => {
+    if (selectedCount === pixels.length) {
+      setColorPickerVisibleAndAnimate(false);
+    }
+    invertSelection();
   };
 
   return (
@@ -262,42 +249,39 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
       <ButtonGroup>
         <IconButton
+          onPress={handleInvert}
+          iconName={{ material: 'rotate-right' }}
+          backgroundColor={theme.colors.bg.light}
+          color={theme.colors.text.dark}
+        />
+        <IconButton
           onPress={deselectAll}
-          disabled={noneSelected}
-          iconName="close"
+          disabled={selectedCount === 0}
+          iconName={{ ion: 'close' }}
           backgroundColor={theme.colors.bg.dark}
-        >
-          Deselect All
-        </IconButton>
+        />
         <IconButton
           onPress={selectAll}
-          disabled={allSelected}
-          iconName="checkmark"
-          backgroundColor={theme.colors.bg.success}
-        >
-          Select All
-        </IconButton>
+          disabled={selectedCount === pixels.length}
+          iconName={{ ion: 'checkmark' }}
+          backgroundColor={theme.colors.bg.primary}
+        />
         <IconButton
           onPress={toggleColorPicker}
           disabled={!currentColor}
-          iconName={colorPickerVisible ? 'eye-off' : 'eye'}
-          backgroundColor={
-            colorPickerVisible
-              ? theme.colors.bg.secondary
-              : theme.colors.bg.info
-          }
-        >
-          Color
-        </IconButton>
+          iconName={{ ion: 'color-palette' }}
+          backgroundColor={theme.colors.bg.info}
+        />
         <IconButton
           onPress={handlePress}
           disabled={setPixelsMutation.isLoading}
-          iconName={
-            setPixelsMutation.isLoading ? 'timer-outline' : 'arrow-forward'
-          }
-        >
-          Submit
-        </IconButton>
+          backgroundColor={theme.colors.bg.success}
+          iconName={{
+            ion: setPixelsMutation.isLoading
+              ? 'timer-outline'
+              : 'arrow-forward',
+          }}
+        />
       </ButtonGroup>
     </View>
   );

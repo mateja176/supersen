@@ -13,6 +13,7 @@ export interface PixelsStore {
   currentColor: Color | null;
   selectRange: (startIndex: number, stopIndex: number) => void;
   setSelected: React.Dispatch<boolean>;
+  invertSelection: () => void;
   setPixels: React.Dispatch<React.SetStateAction<IPixel[]>>;
   setColor: React.Dispatch<Color>;
   setChannel: React.Dispatch<WithChannel>;
@@ -56,6 +57,17 @@ const usePixels = (): PixelsStore => {
     },
     [],
   );
+  const invertSelection: PixelsStore['invertSelection'] =
+    React.useCallback(() => {
+      setPixels((pixels1) =>
+        pixels1.map((pixel) => {
+          return {
+            ...pixel,
+            selected: !pixel.selected,
+          };
+        }),
+      );
+    }, []);
 
   const setColor: PixelsStore['setColor'] = React.useCallback(
     (color: Color) => {
@@ -112,6 +124,7 @@ const usePixels = (): PixelsStore => {
     currentColor,
     selectRange,
     setSelected,
+    invertSelection,
     setPixels,
     setColor,
     setChannel,
