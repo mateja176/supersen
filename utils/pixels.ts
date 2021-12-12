@@ -8,13 +8,12 @@ export const pixelsRange = yRange.flatMap((_, i) =>
   xRange.map((_, j) => xRange.length * i + j),
 );
 
-const [r, g, b, a] = color;
+const [h, s, v] = color;
 
 export const initialColor: Color = tinycolor({
-  r,
-  g,
-  b,
-  a,
+  h,
+  s,
+  v,
 });
 export const initialPixel: IPixel = {
   color: initialColor,

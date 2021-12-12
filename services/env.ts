@@ -1,4 +1,4 @@
-import { API, INITIAL_RGBA, PIXELS_X, PIXELS_Y } from '@env';
+import { API, INITIAL_HSV, PIXELS_X, PIXELS_Y } from '@env';
 import { Api } from '../models/env';
 import { ColorTuple, Int } from '../models/pixels';
 
@@ -28,11 +28,11 @@ if (!maybePixelsY.success) {
 }
 export const pixelsY = maybePixelsY.data;
 
-if (!INITIAL_RGBA) {
-  throw new Error('INITIAL_RGBA is required');
+if (!INITIAL_HSV) {
+  throw new Error('INITIAL_HSV is required');
 }
-const maybeColor = ColorTuple.safeParse(JSON.parse(INITIAL_RGBA));
+const maybeColor = ColorTuple.safeParse(JSON.parse(INITIAL_HSV));
 if (!maybeColor.success) {
-  throw new Error('INITIAL_RGBA must be of type [number, number, number]');
+  throw new Error('INITIAL_HSV must be of type [number, number, number]');
 }
 export const color = maybeColor.data;

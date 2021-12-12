@@ -1,11 +1,9 @@
 import qs from 'qs';
-import { ColorFormats } from 'tinycolor2';
-import { z } from 'zod';
-import { Channel, IPixel, Status } from '../models/pixels';
+import { IPixel, Status } from '../models/pixels';
 import { api } from './env';
 
 const adjustBrightness =
-  (alpha: ColorFormats.RGBA['a']) => (channel: z.infer<typeof Channel>) => {
+  (/** ranging between 0 and 1 */ alpha: number) => (channel: number) => {
     return Math.round((1 - alpha) * 255 + alpha * channel);
   };
 

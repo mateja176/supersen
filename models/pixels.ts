@@ -3,10 +3,11 @@ import { z } from 'zod';
 
 export const Int = z.number().int().min(1);
 
-export const Channel = z.number().int().min(0).max(255);
-export const AlphaChannel = z.number().min(0).max(1);
-
-export const ColorTuple = z.tuple([Channel, Channel, Channel, AlphaChannel]);
+export const ColorTuple = z.tuple([
+  z.number().int().min(0).max(360),
+  z.number().min(0).max(1),
+  z.number().min(0).max(1),
+]);
 
 export type Color = tinycolor.Instance;
 
