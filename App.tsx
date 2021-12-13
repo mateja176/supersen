@@ -6,7 +6,7 @@ import Provider from './Provider';
 export default function App(): React.ReactElement {
   return (
     <Provider>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
 
       <Pixels />
     </Provider>

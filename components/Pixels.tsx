@@ -39,10 +39,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: colorPickerWrapperHeight,
-    paddingLeft: `${colorPickerContentHorizontalPaddingPct}%`,
-    paddingRight: `${colorPickerContentHorizontalPaddingPct}%`,
-    paddingTop: colorPickerContentVerticalPadding,
-    paddingBottom: colorPickerContentVerticalPadding,
+    paddingHorizontal: `${colorPickerContentHorizontalPaddingPct}%`,
+    paddingVertical: colorPickerContentVerticalPadding,
   },
 });
 

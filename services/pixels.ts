@@ -18,7 +18,7 @@ export const setPixels = async (
         Object.fromEntries(
           pixels.map(({ color }, index) => {
             const { r, g, b, a } = color.toRgb();
-            const adjustBrightness$ = adjustBrightness(a);
+            const adjustBrightness1 = adjustBrightness(a);
             const i = Math.floor(index / pixelsCount);
             const increment = i * pixelsCount;
             const input = index - increment;
@@ -38,9 +38,9 @@ export const setPixels = async (
             return [
               alternateIndex,
               JSON.stringify([
-                adjustBrightness$(r),
-                adjustBrightness$(g),
-                adjustBrightness$(b),
+                adjustBrightness1(r),
+                adjustBrightness1(g),
+                adjustBrightness1(b),
               ]),
             ];
           }),

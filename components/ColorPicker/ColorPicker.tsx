@@ -8,6 +8,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 import tinycolor, { ColorFormats } from 'tinycolor2';
+import useTheme from '../../hooks/theme';
 import { NumberPair, WithLayout } from '../../hooks/usePan/models';
 import usePan1D from '../../hooks/usePan/usePan1D';
 import usePan2D from '../../hooks/usePan/usePan2D';
@@ -61,8 +62,11 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   onChange,
   onHueChange,
   onSaturationAndLightnessChange,
+  style,
   ...props
 }) => {
+  const { theme } = useTheme();
+
   const hsvColor = React.useMemo(() => {
     return color.toHsv();
   }, [color]);
@@ -106,10 +110,13 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
     h: hueStore.scaledPosition,
     s: 100,
     v: 100,
-  }).toRgbString();
+  }).toHexString();
 
   return (
-    <View {...props}>
+    <View
+      {...props}
+      style={[style, { backgroundColor: theme.colors.bg.white }]}
+    >
       <View>
         <Slider
           {...saturationAndLightnessStore}
@@ -149,7 +156,11 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
         </Slider>
       </View>
 
-      <Swatches onChange={onChange} style={styles.swatchesLayout} />
+      <Swatches
+        color={color}
+        onChange={onChange}
+        style={styles.swatchesLayout}
+      />
     </View>
   );
 };

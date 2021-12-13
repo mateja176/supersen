@@ -67,7 +67,7 @@ const Pixel: React.FC<PixelProps> = ({
           ...(isRangeSelectIndex ? { borderWidth: 0 } : {}),
           ...outlineStyle,
           borderColor: theme.colors.bg.secondary,
-          backgroundColor: pixel.color.toRgbString(),
+          backgroundColor: pixel.color.toHexString(),
         },
         style,
       ]}
