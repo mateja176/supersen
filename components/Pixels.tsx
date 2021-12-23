@@ -8,15 +8,16 @@ import {
 } from 'react-native';
 import Toast from 'react-native-root-toast';
 import { isError, useMutation } from 'react-query';
-import usePixels from '../hooks/pixels';
+import { Link, useParams } from 'react-router-native';
 import useTheme from '../hooks/theme';
+import usePixels from '../hooks/usePixels';
 import { IPixel } from '../models/pixels';
 import { pixelsX } from '../services/env';
 import * as services from '../services/pixels';
 import { initialColor } from '../utils/pixels';
+import Button from './Button';
 import ButtonGroup from './ButtonGroup';
 import ColorPicker from './ColorPicker/ColorPicker';
-import IconButton from './IconButton';
 import Pixel from './Pixel';
 
 const initialPixels: IPixel[] = [];
@@ -30,6 +31,7 @@ const styles = StyleSheet.create({
   wrapper: {
     position: 'relative',
     overflow: 'hidden',
+    height: '100%',
   },
   pixels: {
     flexWrap: 'wrap',
@@ -51,28 +53,37 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const { theme } = useTheme();
 
-  const setPixelsMutation = useMutation(services.setPixels, {
+  const { ip } = useParams<'ip'>();
+
+  const pixelsMutation = useMutation(services.mutatePixels, {
     onSuccess: () => {
-      Toast.show('Pixels Updated!', {
+      Toast.show('Pixels updated!', {
         backgroundColor: theme.colors.bg.success,
         duration: Toast.durations.SHORT,
       });
     },
   });
-  const handleError = (error: unknown) => {
-    Toast.show(
-      `Update Failed: ${isError(error) ? error.message : 'Unknown reason'}`,
-      {
-        backgroundColor: theme.colors.bg.danger,
-        duration: Toast.durations.SHORT,
-      },
-    );
-  };
+  const handleError = React.useCallback(
+    (error: unknown) => {
+      Toast.show(
+        `Update failed: ${isError(error) ? error.message : 'Unknown reason'}`,
+        {
+          backgroundColor: theme.colors.bg.danger,
+          duration: Toast.durations.SHORT,
+        },
+      );
+    },
+    [theme.colors.bg.danger],
+  );
   React.useEffect(() => {
-    setPixelsMutation.mutateAsync(pixels).catch(handleError);
+    if (ip) {
+      pixelsMutation.mutateAsync({ ip, pixels }).catch(handleError);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const handlePress = () => {
-    setPixelsMutation.mutateAsync(pixels).catch(handleError);
+    if (ip) {
+      pixelsMutation.mutateAsync({ ip, pixels }).catch(handleError);
+    }
   };
 
   const colorPickerContentLayout = React.useMemo(() => {
@@ -176,14 +187,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
   };
 
   return (
-    <View
-      style={[
-        styles.wrapper,
-        {
-          height: dimensions.height,
-        },
-      ]}
-    >
+    <View style={styles.wrapper}>
       <ScrollView contentContainerStyle={styles.pixels} scrollEnabled>
         {pixels.map((pixel, i) => {
           const isRangeSelectIndex = i === rangeSelectIndex;
@@ -246,39 +250,52 @@ const Pixels: React.FC<PixelsProps> = (props) => {
       </Animated.View>
 
       <ButtonGroup>
-        <IconButton
+        <Link to="/">
+          <Button
+            iconName="arrow-back-outline"
+            backgroundColor={theme.colors.bg.dark}
+            disabledColor={theme.colors.bg.dark}
+            disabled
+            color={theme.colors.text.white}
+            accessibilityLabel="Back to dashboard"
+          />
+        </Link>
+        <Button
           onPress={handleInvert}
-          iconName={{ material: 'rotate-right' }}
+          iconName="contrast-outline"
           backgroundColor={theme.colors.bg.light}
           color={theme.colors.text.dark}
+          accessibilityLabel="Invert selection"
         />
-        <IconButton
+        <Button
           onPress={deselectAll}
           disabled={selectedCount === 0}
-          iconName={{ ion: 'close' }}
-          backgroundColor={theme.colors.bg.dark}
+          iconName="close"
+          backgroundColor={theme.colors.bg.danger}
+          accessibilityLabel="Deselect all"
         />
-        <IconButton
+        <Button
           onPress={selectAll}
           disabled={selectedCount === pixels.length}
-          iconName={{ ion: 'checkmark' }}
+          iconName="checkmark"
           backgroundColor={theme.colors.bg.primary}
+          accessibilityLabel="Select all"
         />
-        <IconButton
+        <Button
           onPress={toggleColorPicker}
           disabled={!currentColor}
-          iconName={{ ion: 'color-palette' }}
+          iconName="color-palette-outline"
           backgroundColor={theme.colors.bg.info}
+          accessibilityLabel="Toggle color palette"
         />
-        <IconButton
+        <Button
           onPress={handlePress}
-          disabled={setPixelsMutation.isLoading}
+          disabled={pixelsMutation.isLoading}
           backgroundColor={theme.colors.bg.success}
-          iconName={{
-            ion: setPixelsMutation.isLoading
-              ? 'timer-outline'
-              : 'arrow-forward',
-          }}
+          iconName={
+            pixelsMutation.isLoading ? 'timer-outline' : 'arrow-forward'
+          }
+          accessibilityLabel="Upload changes"
         />
       </ButtonGroup>
     </View>

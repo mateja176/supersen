@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { IPixel, Status } from '../models/pixels';
-import { api, pixelsX, pixelsY } from './env';
+import { pixelsX, pixelsY } from './env';
 
 const pixelsCount = pixelsX * pixelsY;
 
@@ -9,11 +9,15 @@ const adjustBrightness =
     return Math.round((1 - alpha) * 255 + alpha * channel);
   };
 
-export const setPixels = async (
-  pixels: IPixel[],
-): Promise<ReturnType<typeof Status['safeParse']>> => {
+export const mutatePixels = async ({
+  ip,
+  pixels,
+}: {
+  ip: string;
+  pixels: IPixel[];
+}): Promise<ReturnType<typeof Status['safeParse']>> => {
   const response = await fetch(
-    api.concat(
+    ip.concat(
       qs.stringify(
         Object.fromEntries(
           pixels.map(({ color }, index) => {
