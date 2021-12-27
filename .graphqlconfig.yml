@@ -1,0 +1,15 @@
+projects:
+  supersen:
+    schemaPath: amplify/backend/api/supersen/build/schema.graphql
+    includes:
+      - graphql/**/*.ts
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: typescript
+        generatedFileName: API.ts
+        docsFilePath: graphql
+extensions:
+  amplify:
+    version: 3
