@@ -20,18 +20,11 @@ const usePan2D = ({
     [layout, max],
   );
 
-  const descalePosition = React.useCallback(
-    (position: NumberPair) => {
-      return layout
-        ? descaleCoord2D(position, max, [layout.width, layout.height])
-        : initialValue;
-    },
-    [layout, max],
-  );
-
-  const descaledPosition = React.useMemo(() => {
-    return descalePosition(value);
-  }, [descalePosition, value]);
+  const position = React.useMemo(() => {
+    return layout
+      ? descaleCoord2D(value, max, [layout.width, layout.height])
+      : initialValue;
+  }, [layout, max, value]);
 
   const onGestureStateChange = React.useCallback(
     (
@@ -49,16 +42,10 @@ const usePan2D = ({
   );
 
   const panStore = usePan({
-    descaledPosition,
     onChange,
     onGestureStateChange,
     scalePosition,
   });
-
-  const scaledPosition = React.useMemo(
-    () => scalePosition(panStore.position),
-    [panStore.position, scalePosition],
-  );
 
   const handlePress = (e: GestureResponderEvent) => {
     if (layout) {
@@ -73,9 +60,8 @@ const usePan2D = ({
 
   return {
     ...panStore,
-    scaledPosition,
+    position,
     scalePosition,
-    descalePosition,
     onPress: handlePress,
   };
 };

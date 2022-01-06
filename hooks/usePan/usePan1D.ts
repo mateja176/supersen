@@ -23,18 +23,11 @@ const usePan1D = ({ value, max, onChange }: UsePan1DProps): UsePan1DStore => {
     [max],
   );
 
-  const descalePosition = React.useCallback(
-    (position: number) => {
-      return layoutRef.current
-        ? descaleCoord(position, max, layoutRef.current.width)
-        : initialValue;
-    },
-    [max],
-  );
-
-  const descaledPosition = React.useMemo(() => {
-    return descalePosition(value);
-  }, [descalePosition, value]);
+  const position = React.useMemo(() => {
+    return layoutRef.current
+      ? descaleCoord(value, max, layoutRef.current.width)
+      : initialValue;
+  }, [max, value]);
 
   const onGestureStateChange = React.useCallback(
     (e: GestureResponderEvent, gestureState: PanResponderGestureState) => {
@@ -49,9 +42,7 @@ const usePan1D = ({ value, max, onChange }: UsePan1DProps): UsePan1DStore => {
     [],
   );
 
-  const handleLayout = (
-    setPosition: React.Dispatch<React.SetStateAction<number>>,
-  ) => {
+  const handleLayout = (setPosition: React.Dispatch<number>) => {
     surfaceRef.current?.measureInWindow((x, y, width, height) => {
       const layout: LayoutRectangle = {
         x,
@@ -67,31 +58,27 @@ const usePan1D = ({ value, max, onChange }: UsePan1DProps): UsePan1DStore => {
   };
 
   const panStore = usePan({
-    descaledPosition,
     onChange,
     onGestureStateChange,
     scalePosition,
     onLayout: handleLayout,
   });
 
-  const scaledPosition = React.useMemo(
-    () => scalePosition(panStore.position),
-    [panStore.position, scalePosition],
+  const handlePress = React.useCallback(
+    (e: GestureResponderEvent) => {
+      if (layoutRef.current) {
+        onChange(scalePosition(e.nativeEvent.pageX - layoutRef.current.x));
+      }
+    },
+    [onChange, scalePosition],
   );
-
-  const handlePress = (e: GestureResponderEvent) => {
-    if (layoutRef.current) {
-      onChange(scalePosition(e.nativeEvent.pageX - layoutRef.current.x));
-    }
-  };
 
   return {
     ...panStore,
+    position,
     surfaceRef,
     layoutRef,
-    scaledPosition,
     scalePosition,
-    descalePosition,
     onPress: handlePress,
   };
 };

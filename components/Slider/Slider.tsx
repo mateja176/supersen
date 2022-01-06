@@ -122,4 +122,4 @@ const Slider = <Position extends number | NumberPair>({
   );
 };
 
-export default Slider;
+export default React.memo(Slider);

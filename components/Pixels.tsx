@@ -12,7 +12,6 @@ import { Link, useParams } from 'react-router-native';
 import useTheme from '../hooks/theme';
 import usePixels from '../hooks/usePixels';
 import { IPixel } from '../models/pixels';
-import { pixelsX } from '../services/env';
 import * as services from '../services/pixels';
 import { initialColor } from '../utils/pixels';
 import Button from './Button';
@@ -37,6 +36,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     flexDirection: 'row',
   },
+  pixel: {
+    marginRight: '4%',
+    marginTop: '4%',
+  },
   colorPickerWrapper: {
     position: 'absolute',
     width: '100%',
@@ -55,13 +58,14 @@ const Pixels: React.FC<PixelsProps> = (props) => {
 
   const { ip } = useParams<'ip'>();
 
+  const handleSuccess = React.useCallback(() => {
+    Toast.show('Pixels updated!', {
+      backgroundColor: theme.colors.bg.success,
+      duration: Toast.durations.SHORT,
+    });
+  }, [theme.colors.bg.success]);
   const pixelsMutation = useMutation(services.mutatePixels, {
-    onSuccess: () => {
-      Toast.show('Pixels updated!', {
-        backgroundColor: theme.colors.bg.success,
-        duration: Toast.durations.SHORT,
-      });
-    },
+    onSuccess: handleSuccess,
   });
   const handleError = React.useCallback(
     (error: unknown) => {
@@ -80,11 +84,6 @@ const Pixels: React.FC<PixelsProps> = (props) => {
       pixelsMutation.mutateAsync({ ip, pixels }).catch(handleError);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const handlePress = () => {
-    if (ip) {
-      pixelsMutation.mutateAsync({ ip, pixels }).catch(handleError);
-    }
-  };
 
   const colorPickerContentLayout = React.useMemo(() => {
     const colorPickerContentHorizontalPadding =
@@ -123,12 +122,6 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     },
     [colorPickerWrapperTranslateY],
   );
-  const toggleColorPicker = () => {
-    setColorPickerVisibleAndAnimate((visible) => {
-      return !visible;
-    });
-  };
-
   const [rangeSelectIndex, setRangeSelectIndex] = React.useState<number | null>(
     null,
   );
@@ -185,42 +178,55 @@ const Pixels: React.FC<PixelsProps> = (props) => {
     }
     invertSelection();
   };
+  const toggleColorPicker = () => {
+    setColorPickerVisibleAndAnimate((visible) => {
+      return !visible;
+    });
+  };
+  const handleUpload = () => {
+    if (ip) {
+      pixelsMutation.mutateAsync({ ip, pixels }).catch(handleError);
+    }
+  };
+
+  const handlePixelPress = React.useCallback(
+    (index: number, rangeSelectIndex: number | null) => {
+      if (rangeSelectIndex === null) {
+        handleToggle(index);
+      } else {
+        selectRange(
+          Math.min(index, rangeSelectIndex),
+          Math.max(index, rangeSelectIndex),
+        );
+        setRangeSelectIndex(null);
+      }
+    },
+    [handleToggle, selectRange],
+  );
+  const handlePixelLongPress = React.useCallback(
+    (index: number, isRangeSelectIndex: boolean) => {
+      if (isRangeSelectIndex) {
+        setRangeSelectIndex(null);
+      } else {
+        setRangeSelectIndex(index);
+      }
+    },
+    [],
+  );
 
   return (
     <View style={styles.wrapper}>
       <ScrollView contentContainerStyle={styles.pixels} scrollEnabled>
         {pixels.map((pixel, i) => {
-          const isRangeSelectIndex = i === rangeSelectIndex;
-
           return (
             <Pixel
               key={i}
+              index={i}
+              rangeSelectIndex={rangeSelectIndex}
               pixel={pixel}
-              isRangeSelectIndex={isRangeSelectIndex}
-              style={{
-                marginRight: '4%',
-                marginLeft: i % pixelsX === 0 ? '4%' : 0,
-                marginTop: '4%',
-                marginBottom: i > pixels.length - 5 ? 300 : 0,
-              }}
-              onPress={() => {
-                if (rangeSelectIndex === null) {
-                  handleToggle(i);
-                } else {
-                  selectRange(
-                    Math.min(i, rangeSelectIndex),
-                    Math.max(i, rangeSelectIndex),
-                  );
-                  setRangeSelectIndex(null);
-                }
-              }}
-              onLongPress={() => {
-                if (isRangeSelectIndex) {
-                  setRangeSelectIndex(null);
-                } else {
-                  setRangeSelectIndex(i);
-                }
-              }}
+              style={styles.pixel}
+              onPress={handlePixelPress}
+              onLongPress={handlePixelLongPress}
             />
           );
         })}
@@ -289,7 +295,7 @@ const Pixels: React.FC<PixelsProps> = (props) => {
           accessibilityLabel="Toggle color palette"
         />
         <Button
-          onPress={handlePress}
+          onPress={handleUpload}
           disabled={pixelsMutation.isLoading}
           backgroundColor={theme.colors.bg.success}
           iconName={

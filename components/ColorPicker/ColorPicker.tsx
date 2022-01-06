@@ -107,7 +107,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   });
 
   const hueColor = tinycolor({
-    h: hueStore.scaledPosition,
+    h: originalHue,
     s: 100,
     v: 100,
   }).toHexString();
@@ -156,11 +156,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
         </Slider>
       </View>
 
-      <Swatches
-        color={color}
-        onChange={onChange}
-        style={styles.swatchesLayout}
-      />
+      <Swatches onChange={onChange} style={styles.swatchesLayout} />
     </View>
   );
 };

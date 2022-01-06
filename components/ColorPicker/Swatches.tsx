@@ -63,12 +63,10 @@ const styles = StyleSheet.create({
 });
 
 export interface SwatchesProps extends ScrollViewProps {
-  color: Color;
   onChange: React.Dispatch<Color>;
 }
 
 const Swatches: React.FC<SwatchesProps> = ({
-  color,
   onChange,
   contentContainerStyle,
   ...props
@@ -83,7 +81,8 @@ const Swatches: React.FC<SwatchesProps> = ({
     >
       {swatchColors.map((swatchColor) => {
         const swatchHex = swatchColor.toHexString();
-        const isSelected = swatchHex === color.toHexString();
+        // * using currentColor is a performance bottleneck
+        const isSelected = false;
         const shadowColor = tinycolor(swatchHex).darken(55).toHexString();
         return (
           <Pressable
@@ -133,4 +132,4 @@ const Swatches: React.FC<SwatchesProps> = ({
   );
 };
 
-export default Swatches;
+export default React.memo(Swatches);
