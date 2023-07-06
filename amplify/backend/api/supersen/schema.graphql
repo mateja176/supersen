@@ -9,3 +9,4 @@ type Device @model {
   name: String!
   description: String
 }
+  

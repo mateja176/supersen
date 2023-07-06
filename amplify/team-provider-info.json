@@ -10,6 +10,11 @@
       "StackName": "amplify-supersen-dev-163602",
       "StackId": "arn:aws:cloudformation:eu-central-1:381315795627:stack/amplify-supersen-dev-163602/b4dd4490-672a-11ec-83e7-0a4e79c28f7a",
       "AmplifyAppId": "d3deelk6ma4gi7"
+    },
+    "categories": {
+      "auth": {
+        "supersen": {}
+      }
     }
   }
 }

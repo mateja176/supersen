@@ -1,4 +1,7 @@
 {
+  "providers": [
+    "awscloudformation"
+  ],
   "projectName": "supersen",
   "version": "3.1",
   "frontend": "javascript",
@@ -6,12 +9,9 @@
     "framework": "react-native",
     "config": {
       "SourceDir": ".",
-      "DistributionDir": ".",
-      "BuildCommand": "npm run-script build",
+      "DistributionDir": "dist",
+      "BuildCommand": "npx expo export -p web",
       "StartCommand": "npm run-script start"
     }
-  },
-  "providers": [
-    "awscloudformation"
-  ]
+  }
 }
