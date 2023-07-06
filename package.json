@@ -1,5 +1,9 @@
 {
   "main": "node_modules/expo/AppEntry.js",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=16 <17"
+  },
   "scripts": {
     "start": "expo start",
     "postinstall": "patch-package",
